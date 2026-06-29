@@ -132,7 +132,7 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 32px;
             padding: 40px;
-            max-width: 440px;
+            max-width: 480px;
             width: 100%;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         }
@@ -181,71 +181,6 @@
             box-shadow: 0 8px 24px rgba(255, 107, 0, 0.3);
         }
 
-        .notification-item {
-            border-left: 4px solid #FF6B00;
-            background: white;
-            transition: all 0.3s;
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 12px;
-        }
-        .notification-item:hover {
-            background: #f8fafc;
-        }
-        .notification-item.confirmed {
-            border-left-color: #22c55e;
-            opacity: 0.7;
-        }
-        .notification-item.replaced {
-            border-left-color: #f59e0b;
-            opacity: 0.7;
-        }
-        .notification-item .action-buttons {
-            display: flex;
-            gap: 8px;
-            margin-top: 12px;
-        }
-        .notification-item .action-buttons button {
-            flex: 1;
-            padding: 8px 16px;
-            border-radius: 12px;
-            font-size: 13px;
-            font-weight: 600;
-            transition: all 0.3s;
-            border: none;
-            cursor: pointer;
-        }
-        .notification-item .action-buttons .btn-confirm {
-            background: #22c55e;
-            color: white;
-        }
-        .notification-item .action-buttons .btn-confirm:hover {
-            background: #16a34a;
-        }
-        .notification-item .action-buttons .btn-replace {
-            background: #f59e0b;
-            color: white;
-        }
-        .notification-item .action-buttons .btn-replace:hover {
-            background: #d97706;
-        }
-
-        .notification-count {
-            background: #ef4444;
-            color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-            font-weight: 700;
-            position: absolute;
-            top: -4px;
-            right: -4px;
-        }
-
         .admin-badge {
             background: #8b5cf6;
             color: white;
@@ -256,17 +191,37 @@
             letter-spacing: 0.5px;
         }
 
-        .admin-user-card {
+        .igreja-card {
+            border: 2px solid #e2e8f0;
             transition: all 0.3s;
         }
-        .admin-user-card:hover {
-            background: #f8fafc;
+        .igreja-card:hover {
+            border-color: #FF6B00;
+            box-shadow: 0 4px 12px rgba(255, 107, 0, 0.15);
         }
-        .admin-user-card .role-toggle {
-            transition: all 0.3s;
+        .igreja-card.selected {
+            border-color: #FF6B00;
+            background: #fff7ed;
         }
-        .admin-user-card .role-toggle:hover {
-            transform: scale(1.05);
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        .empty-state i {
+            font-size: 64px;
+            color: #cbd5e1;
+            margin-bottom: 16px;
+        }
+        .empty-state h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 8px;
+        }
+        .empty-state p {
+            color: #94a3b8;
+            font-size: 14px;
         }
     </style>
 </head>
@@ -276,9 +231,10 @@
         <div class="auth-card">
             <div class="auth-logo">MA</div>
             <h2 id="auth-title" class="text-2xl font-bold text-center text-slate-800 mb-2">Bem-vindo</h2>
-            <p id="auth-subtitle" class="text-center text-slate-500 text-sm mb-6">Escalas Mídia ADENF</p>
+            <p id="auth-subtitle" class="text-center text-slate-500 text-sm mb-6">Sistema de Escalas - ADENF</p>
             
             <form id="auth-form" onsubmit="handleAuth(event)" class="space-y-4">
+                <!-- Campos de registro -->
                 <div id="register-fields" class="hidden space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1.5">Nome Completo</label>
@@ -287,6 +243,11 @@
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1.5">Celular</label>
                         <input type="tel" id="reg-celular" class="auth-input" placeholder="(88) 99999-9999" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1.5">Código da Igreja</label>
+                        <input type="text" id="reg-codigo-igreja" class="auth-input" placeholder="Digite o código da igreja">
+                        <p class="text-xs text-slate-400 mt-1">Deixe em branco se for criar uma nova igreja</p>
                     </div>
                 </div>
 
@@ -306,6 +267,7 @@
                 <div id="admin-password-field" class="hidden">
                     <label class="block text-sm font-medium text-slate-700 mb-1.5">Senha de Administrador</label>
                     <input type="password" id="admin-password" class="auth-input" placeholder="Digite a senha de admin">
+                    <p class="text-xs text-slate-400 mt-1">Necessário apenas para administradores</p>
                 </div>
 
                 <button type="submit" id="auth-submit-btn" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3.5 rounded-2xl transition-all btn-touch text-base">
@@ -326,10 +288,8 @@
 
     <!-- MAIN APP -->
     <div id="app-container" class="hidden flex h-screen overflow-hidden">
-        <!-- SIDEBAR OVERLAY -->
-        <div id="sidebar-overlay" class="sidebar-overlay fixed inset-0 bg-black/50 z-40 lg:hidden" onclick="closeSidebar()"></div>
-
         <!-- SIDEBAR -->
+        <div id="sidebar-overlay" class="sidebar-overlay fixed inset-0 bg-black/50 z-40 lg:hidden" onclick="closeSidebar()"></div>
         <div id="sidebar" class="sidebar-mobile lg:sidebar-mobile lg:translate-x-0 fixed lg:relative w-72 lg:w-64 h-full bg-white border-r border-slate-200 flex flex-col z-50 shadow-2xl lg:shadow-none">
             <div class="p-5 border-b border-slate-200 flex items-center justify-between">
                 <div class="flex items-center gap-3">
@@ -354,6 +314,7 @@
                     <div class="flex-1 min-w-0">
                         <div class="font-semibold text-sm truncate" id="user-name-display">Usuário</div>
                         <div class="text-xs text-slate-500 truncate" id="user-email-display">email@email.com</div>
+                        <div class="text-xs text-orange-600 truncate" id="user-igreja-display"></div>
                     </div>
                     <button onclick="logout()" class="text-slate-400 hover:text-red-500 transition-colors p-1" title="Sair">
                         <i class="fa-solid fa-right-from-bracket"></i>
@@ -364,7 +325,6 @@
 
         <!-- MAIN CONTENT -->
         <div class="flex-1 flex flex-col min-w-0">
-            <!-- TOP NAV -->
             <nav class="h-14 border-b bg-white/95 backdrop-blur-sm px-4 md:px-6 flex items-center justify-between sticky top-0 z-30 safe-area-top">
                 <div class="flex items-center gap-3 min-w-0">
                     <button onclick="toggleSidebar()" class="lg:hidden text-slate-500 hover:text-orange-500 p-2 -ml-2 transition-colors">
@@ -424,7 +384,11 @@
                 </button>
             </div>
             <div id="notifications-list" class="p-4 overflow-auto max-h-[calc(90vh-140px)]">
-                <!-- Populated by JS -->
+                <div class="empty-state">
+                    <i class="fa-regular fa-bell-slash"></i>
+                    <h3>Sem notificações</h3>
+                    <p>Você será notificado quando for escalado</p>
+                </div>
             </div>
         </div>
     </div>
@@ -442,7 +406,11 @@
                 </button>
             </div>
             <div id="admin-users-list" class="p-4 overflow-auto max-h-[calc(90vh-140px)]">
-                <!-- Populated by JS -->
+                <div class="empty-state">
+                    <i class="fa-regular fa-users"></i>
+                    <h3>Nenhum usuário</h3>
+                    <p>Os usuários aparecerão aqui quando se cadastrarem</p>
+                </div>
             </div>
         </div>
     </div>
@@ -461,7 +429,6 @@
             APP_NAME: 'Escalas Mídia Adenf',
             STORAGE_KEY: 'midia_adenf_data',
             ADMIN_PASSWORD: 'Admin1975',
-            MASTER_ADMIN_EMAIL: 'isaque_severo@icloud.com',
             VERSION: '1.0.0'
         };
 
@@ -474,68 +441,24 @@
             currentPage: 'dashboard',
             sidebarOpen: false,
             mobileSearchOpen: false,
-            editingCultoId: null,
-            positionToAssign: null,
             isLoginMode: true
         };
 
         // ============================================
-        // DADOS
+        // DADOS - TUDO VAZIO INICIALMENTE
         // ============================================
+        let igrejas = [];
         let membros = [];
         let cultos = [];
         let notifications = [];
         let usuarios = [];
-
-        // Dados iniciais
-        const membrosPadrao = [
-            { id: 1, nome: "Isaque Severo", foto: "https://i.pravatar.cc/150?u=isaque", funcao: "Coordenação", telefone: "(88) 99999-1234", email: "isaque_severo@icloud.com" },
-            { id: 2, nome: "Ana Clara", foto: "https://i.pravatar.cc/150?u=ana", funcao: "Projeção", telefone: "(88) 99999-5678", email: "ana@email.com" },
-            { id: 3, nome: "Lucas Mendes", foto: "https://i.pravatar.cc/150?u=lucas", funcao: "Som", telefone: "(88) 99999-4321", email: "lucas@email.com" },
-            { id: 4, nome: "Beatriz Lima", foto: "https://i.pravatar.cc/150?u=beatriz", funcao: "Livestream", telefone: "(88) 99999-8765", email: "beatriz@email.com" },
-            { id: 5, nome: "Rafael Costa", foto: "https://i.pravatar.cc/150?u=rafael", funcao: "Fotografia", telefone: "(88) 99999-1122", email: "rafael@email.com" },
-            { id: 6, nome: "Mariana Silva", foto: "https://i.pravatar.cc/150?u=mariana", funcao: "Iluminação", telefone: "(88) 99999-3344", email: "mariana@email.com" }
-        ];
-
-        const cultosPadrao = [
-            {
-                id: 1,
-                data: new Date(Date.now() + 86400000 * 2).toISOString().split('T')[0],
-                horario: "09:00",
-                tipo: "Culto de Domingo - Manhã",
-                status: "publicada",
-                escalas: {
-                    "Coordenação de Mídia": 1,
-                    "Som Principal": 3,
-                    "Projeção": 2,
-                    "Livestream": 4,
-                    "Fotografia": null,
-                    "Iluminação": 6
-                }
-            },
-            {
-                id: 2,
-                data: new Date(Date.now() + 86400000 * 2).toISOString().split('T')[0],
-                horario: "18:30",
-                tipo: "Culto de Domingo - Noite",
-                status: "publicada",
-                escalas: {
-                    "Coordenação de Mídia": 1,
-                    "Som Principal": null,
-                    "Projeção": 2,
-                    "Livestream": null,
-                    "Fotografia": 5,
-                    "Iluminação": null
-                }
-            }
-        ];
 
         // ============================================
         // PERSISTÊNCIA
         // ============================================
         function saveData() {
             try {
-                const data = { membros, cultos, notifications, usuarios };
+                const data = { igrejas, membros, cultos, notifications, usuarios };
                 localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(data));
             } catch (e) {
                 console.warn('Erro ao salvar dados:', e);
@@ -547,6 +470,7 @@
                 const saved = localStorage.getItem(CONFIG.STORAGE_KEY);
                 if (saved) {
                     const data = JSON.parse(saved);
+                    igrejas = data.igrejas || [];
                     membros = data.membros || [];
                     cultos = data.cultos || [];
                     notifications = data.notifications || [];
@@ -560,27 +484,13 @@
         }
 
         function initDefaultData() {
-            // Cria admin master (Isaque Severo)
-            const masterAdmin = {
-                id: 1,
-                nome: "Isaque Severo",
-                email: CONFIG.MASTER_ADMIN_EMAIL,
-                celular: "(88) 99999-1234",
-                senha: "Admin1975",
-                isAdmin: true,
-                isMaster: true
-            };
-
-            // Verifica se já existe
-            const exists = usuarios.find(u => u.email === CONFIG.MASTER_ADMIN_EMAIL);
-            if (!exists) {
-                usuarios = [masterAdmin];
-                // Adiciona membros
-                membros = [...membrosPadrao];
-                // Adiciona cultos
-                cultos = [...cultosPadrao];
-                saveData();
-            }
+            // Tudo vazio! O admin master será criado via cadastro
+            igrejas = [];
+            membros = [];
+            cultos = [];
+            notifications = [];
+            usuarios = [];
+            saveData();
         }
 
         // ============================================
@@ -665,7 +575,6 @@
                     }
                 }
                 
-                // Login bem-sucedido
                 state.currentUser = user;
                 state.isAdmin = user.isAdmin || false;
                 loginSuccess();
@@ -674,6 +583,7 @@
                 // REGISTRO
                 const nome = document.getElementById('reg-nome').value.trim();
                 const celular = document.getElementById('reg-celular').value.trim();
+                const codigoIgreja = document.getElementById('reg-codigo-igreja').value.trim();
                 
                 if (!nome || !celular) {
                     showAuthError('Preencha todos os campos de cadastro.');
@@ -690,34 +600,74 @@
                     return;
                 }
                 
-                // Cria novo usuário (sempre voluntário inicialmente)
+                // Verifica se é o primeiro usuário (será admin)
+                const isFirstUser = usuarios.length === 0;
+                
+                // Verifica código da igreja
+                let igrejaId = null;
+                if (codigoIgreja) {
+                    const igreja = igrejas.find(i => i.codigo === codigoIgreja);
+                    if (!igreja) {
+                        showAuthError('Código da igreja inválido. Verifique ou deixe em branco para criar uma nova.');
+                        return;
+                    }
+                    igrejaId = igreja.id;
+                }
+                
+                // Se for o primeiro usuário, ele será admin e poderá criar a igreja depois
+                const isAdmin = isFirstUser || false;
+                
                 const newUser = {
                     id: Date.now(),
                     nome,
                     email,
                     celular,
                     senha,
-                    isAdmin: false,
-                    isMaster: false
+                    isAdmin: isAdmin,
+                    isMaster: isFirstUser,
+                    igrejaId: igrejaId,
+                    dataCriacao: new Date().toISOString()
                 };
                 usuarios.push(newUser);
                 
-                // Adiciona como membro
-                membros.push({
-                    id: newUser.id,
-                    nome: newUser.nome,
-                    foto: `https://i.pravatar.cc/150?u=${newUser.id}`,
-                    funcao: "Voluntário",
-                    telefone: newUser.celular,
-                    email: newUser.email
-                });
+                // Se não tiver igreja, adiciona como membro sem igreja
+                if (!igrejaId) {
+                    membros.push({
+                        id: newUser.id,
+                        nome: newUser.nome,
+                        foto: `https://i.pravatar.cc/150?u=${newUser.id}`,
+                        funcao: isAdmin ? 'Administrador' : 'Voluntário',
+                        telefone: newUser.celular,
+                        email: newUser.email,
+                        igrejaId: null
+                    });
+                } else {
+                    // Adiciona à igreja existente
+                    membros.push({
+                        id: newUser.id,
+                        nome: newUser.nome,
+                        foto: `https://i.pravatar.cc/150?u=${newUser.id}`,
+                        funcao: isAdmin ? 'Administrador' : 'Voluntário',
+                        telefone: newUser.celular,
+                        email: newUser.email,
+                        igrejaId: igrejaId
+                    });
+                }
                 
                 saveData();
                 
-                showToast('✅ Conta criada com sucesso! Faça login.', 'fa-check-circle');
-                toggleAuthMode();
-                document.getElementById('auth-email').value = email;
-                document.getElementById('auth-password').value = '';
+                if (isFirstUser) {
+                    showToast('✅ Conta criada! Você é o administrador master. Crie sua igreja agora.', 'fa-crown');
+                    // Login automático
+                    state.currentUser = newUser;
+                    state.isAdmin = true;
+                    loginSuccess();
+                } else {
+                    showToast('✅ Conta criada com sucesso! Faça login.', 'fa-check-circle');
+                    toggleAuthMode();
+                    document.getElementById('auth-email').value = email;
+                    document.getElementById('auth-password').value = '';
+                }
             }
         }
 
@@ -735,7 +685,6 @@
             document.getElementById('auth-container').classList.add('hidden');
             document.getElementById('app-container').classList.remove('hidden');
             
-            // Atualiza UI
             const user = state.currentUser;
             document.getElementById('user-name-display').textContent = user.nome;
             document.getElementById('user-email-display').textContent = user.email;
@@ -743,15 +692,21 @@
             document.getElementById('nav-avatar').textContent = user.nome.substring(0, 2).toUpperCase();
             document.getElementById('user-avatar').textContent = user.nome.substring(0, 2).toUpperCase();
             
+            // Mostra igreja do usuário
+            if (user.igrejaId) {
+                const igreja = igrejas.find(i => i.id === user.igrejaId);
+                if (igreja) {
+                    document.getElementById('user-igreja-display').textContent = `🏛️ ${igreja.nome}`;
+                }
+            }
+            
             if (state.isAdmin) {
                 document.getElementById('nav-role').innerHTML = 'Administrador <span class="admin-badge">ADMIN</span>';
             } else {
                 document.getElementById('nav-role').textContent = 'Voluntário';
             }
             
-            // Inicializa app
             initializeApp();
-            
             showToast(`👋 Bem-vindo, ${user.nome}!`, 'fa-hand-wave');
         }
 
@@ -765,6 +720,51 @@
                 document.getElementById('admin-password').value = '';
                 showToast('👋 Até logo!', 'fa-wave');
             }
+        }
+
+        // ============================================
+        // GERENCIAMENTO DE IGREJA
+        // ============================================
+        function createIgreja() {
+            const nome = prompt('Digite o nome da sua igreja:');
+            if (!nome) return;
+            
+            const endereco = prompt('Digite o endereço da igreja:');
+            const pastor = prompt('Digite o nome do pastor/ líder:');
+            
+            const codigo = 'IGR-' + Date.now().toString().slice(-6);
+            
+            const novaIgreja = {
+                id: Date.now(),
+                nome: nome,
+                endereco: endereco || '',
+                pastor: pastor || '',
+                codigo: codigo,
+                dataCriacao: new Date().toISOString(),
+                adminId: state.currentUser.id
+            };
+            
+            igrejas.push(novaIgreja);
+            
+            // Atualiza o usuário com a igreja
+            const user = usuarios.find(u => u.id === state.currentUser.id);
+            if (user) {
+                user.igrejaId = novaIgreja.id;
+                // Atualiza o membro
+                const member = membros.find(m => m.id === state.currentUser.id);
+                if (member) {
+                    member.igrejaId = novaIgreja.id;
+                }
+            }
+            
+            saveData();
+            
+            showToast(`✅ Igreja "${nome}" criada com sucesso!`, 'fa-church');
+            navigateTo('dashboard');
+            
+            // Atualiza display da igreja
+            document.getElementById('user-igreja-display').textContent = `🏛️ ${nome}`;
+            document.getElementById('user-igreja-display').classList.remove('hidden');
         }
 
         // ============================================
@@ -785,15 +785,19 @@
         function renderAdminUsersList() {
             const container = document.getElementById('admin-users-list');
             
-            // Usuários que podem ser gerenciados (todos exceto o master admin)
-            const manageUsers = usuarios.filter(u => !u.isMaster);
+            // Filtra usuários da mesma igreja
+            const currentUserIgrejaId = state.currentUser.igrejaId;
+            const usersFromIgreja = usuarios.filter(u => {
+                if (u.id === state.currentUser.id) return true;
+                return u.igrejaId === currentUserIgrejaId;
+            });
             
-            if (manageUsers.length === 0) {
+            if (usersFromIgreja.length === 0) {
                 container.innerHTML = `
-                    <div class="text-center py-12 text-slate-400">
-                        <i class="fa-solid fa-users-slash text-4xl mb-3 block"></i>
-                        <p>Nenhum usuário para gerenciar</p>
-                        <p class="text-sm">Os usuários aparecerão aqui quando se cadastrarem</p>
+                    <div class="empty-state">
+                        <i class="fa-regular fa-users"></i>
+                        <h3>Nenhum usuário</h3>
+                        <p>Os usuários aparecerão aqui quando se cadastrarem na sua igreja</p>
                     </div>
                 `;
                 return;
@@ -801,8 +805,9 @@
             
             container.innerHTML = `
                 <div class="space-y-3">
-                    ${manageUsers.map(user => {
+                    ${usersFromIgreja.map(user => {
                         const isAdmin = user.isAdmin || false;
+                        const isMaster = user.isMaster || false;
                         const member = membros.find(m => m.id === user.id);
                         
                         return `
@@ -812,7 +817,7 @@
                                         ${user.nome.substring(0, 2).toUpperCase()}
                                     </div>
                                     <div class="min-w-0">
-                                        <div class="font-semibold text-sm truncate">${user.nome}</div>
+                                        <div class="font-semibold text-sm truncate">${user.nome} ${isMaster ? '👑' : ''}</div>
                                         <div class="text-xs text-slate-500 truncate">${user.email}</div>
                                         ${member ? `<div class="text-xs text-slate-400 mt-0.5">${member.funcao}</div>` : ''}
                                     </div>
@@ -821,10 +826,12 @@
                                     <span class="text-xs text-slate-500 mr-1">
                                         ${isAdmin ? '👑 Admin' : '👤 Voluntário'}
                                     </span>
+                                    ${!isMaster && user.id !== state.currentUser.id ? `
                                     <button onclick="toggleUserAdmin(${user.id})" 
                                             class="role-toggle px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors ${isAdmin ? 'bg-red-100 text-red-700 hover:bg-red-200' : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'}">
                                         ${isAdmin ? 'Remover Admin' : 'Tornar Admin'}
-                                    </button>
+                                    </button>` : ''}
+                                    ${isMaster ? '<span class="text-xs text-purple-600 font-semibold">MASTER</span>' : ''}
                                 </div>
                             </div>
                         `;
@@ -832,7 +839,7 @@
                 </div>
                 <div class="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-2xl text-sm text-amber-700">
                     <i class="fa-solid fa-info-circle mr-2"></i>
-                    O administrador master (${CONFIG.MASTER_ADMIN_EMAIL}) não pode ser removido.
+                    Apenas usuários da sua igreja aparecem aqui. O administrador master (criador) não pode ser removido.
                 </div>
             `;
         }
@@ -841,23 +848,20 @@
             const user = usuarios.find(u => u.id === userId);
             if (!user) return;
             
-            // Não permite alterar o master admin
             if (user.isMaster) {
                 showToast('⚠️ Não é possível alterar o administrador master.', 'fa-exclamation-triangle');
                 return;
             }
             
-            // Não permite remover o último admin (exceto master)
-            const adminCount = usuarios.filter(u => u.isAdmin).length;
+            const adminCount = usuarios.filter(u => u.isAdmin && u.igrejaId === state.currentUser.igrejaId).length;
             if (user.isAdmin && adminCount <= 1) {
-                showToast('⚠️ Deve haver pelo menos um administrador (além do master).', 'fa-exclamation-triangle');
+                showToast('⚠️ Deve haver pelo menos um administrador.', 'fa-exclamation-triangle');
                 return;
             }
             
             user.isAdmin = !user.isAdmin;
             saveData();
             
-            // Atualiza o membro correspondente
             const member = membros.find(m => m.id === userId);
             if (member) {
                 member.funcao = user.isAdmin ? 'Administrador' : 'Voluntário';
@@ -872,7 +876,6 @@
             
             renderAdminUsersList();
             
-            // Se o usuário atual foi alterado, atualiza UI
             if (state.currentUser.id === userId) {
                 state.isAdmin = user.isAdmin;
                 if (state.isAdmin) {
@@ -883,6 +886,660 @@
                 renderSidebar();
                 navigateTo(state.currentPage);
             }
+        }
+
+        // ============================================
+        // NAVEGAÇÃO
+        // ============================================
+        const navItems = [
+            { icon: "fa-house", label: "Início", id: "dashboard" },
+            { icon: "fa-calendar-check", label: "Minhas Escalas", id: "my-scales" },
+            { icon: "fa-list", label: "Todas as Escalas", id: "all-scales" },
+            { icon: "fa-users", label: "Equipe", id: "team" }
+        ];
+
+        function getNavItems() {
+            const items = [...navItems];
+            if (state.isAdmin) {
+                items.push({ icon: "fa-gear", label: "Admin", id: "admin" });
+            }
+            return items;
+        }
+
+        function renderSidebar() {
+            const container = document.getElementById("sidebar-menu");
+            const items = getNavItems();
+            
+            container.innerHTML = `
+                <nav class="space-y-1 px-2">
+                    ${items.map(item => `
+                        <div onclick="navigateTo('${item.id}')" 
+                             class="flex items-center gap-3 px-4 py-3.5 rounded-2xl cursor-pointer text-slate-600 hover:text-orange-600 transition-all group ${state.currentPage === item.id ? 'bg-orange-50 text-orange-600 font-semibold' : ''}"
+                             data-page="${item.id}">
+                            <i class="fa-solid ${item.icon} w-5 text-lg group-hover:scale-110 transition-transform"></i>
+                            <span class="font-medium">${item.label}</span>
+                            ${state.currentPage === item.id ? '<span class="ml-auto w-1.5 h-8 bg-orange-500 rounded-full"></span>' : ''}
+                        </div>
+                    `).join('')}
+                </nav>
+            `;
+        }
+
+        function navigateTo(page) {
+            state.currentPage = page;
+            const pageTitle = getNavItems().find(n => n.id === page)?.label || page;
+            document.getElementById("page-title").textContent = pageTitle;
+            
+            closeSidebar();
+            renderSidebar();
+            
+            const content = document.getElementById("main-content");
+            
+            switch(page) {
+                case "dashboard": renderDashboard(); break;
+                case "all-scales": renderAllScales(); break;
+                case "my-scales": renderMyScales(); break;
+                case "team": renderTeam(); break;
+                case "admin": renderAdminPanel(); break;
+                default: renderDashboard();
+            }
+        }
+
+        // ============================================
+        // PÁGINAS
+        // ============================================
+        function renderDashboard() {
+            const container = document.getElementById("main-content");
+            const userIgreja = igrejas.find(i => i.id === state.currentUser.igrejaId);
+            
+            // Se o usuário é admin master e não tem igreja, mostra para criar
+            if (state.currentUser.isMaster && !state.currentUser.igrejaId) {
+                container.innerHTML = `
+                    <div class="max-w-7xl mx-auto">
+                        <div class="bg-white rounded-3xl p-8 md:p-12 text-center card-hover border-2 border-orange-200">
+                            <div class="text-6xl mb-6">🏛️</div>
+                            <h2 class="text-2xl md:text-3xl font-bold text-slate-800 mb-4">Crie sua Igreja</h2>
+                            <p class="text-slate-500 mb-6 max-w-md mx-auto">
+                                Você é o administrador master. Crie sua igreja para começar a gerenciar escalas.
+                            </p>
+                            <button onclick="createIgreja()" 
+                                    class="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-2xl font-bold btn-touch transition-colors inline-flex items-center gap-3">
+                                <i class="fa-solid fa-plus-circle"></i>
+                                Criar Igreja
+                            </button>
+                            <div class="mt-6 text-sm text-slate-400">
+                                <i class="fa-solid fa-info-circle"></i>
+                                Você pode convidar membros depois de criar a igreja
+                            </div>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Se não tem igreja, mostra mensagem
+            if (!userIgreja) {
+                container.innerHTML = `
+                    <div class="max-w-7xl mx-auto">
+                        <div class="bg-white rounded-3xl p-8 md:p-12 text-center card-hover">
+                            <div class="text-6xl mb-6">🏛️</div>
+                            <h2 class="text-2xl font-bold text-slate-800 mb-4">Você não está vinculado a uma igreja</h2>
+                            <p class="text-slate-500">Entre em contato com o administrador da sua igreja para obter o código de acesso.</p>
+                            <p class="text-slate-400 text-sm mt-4">Código da igreja: <span class="font-mono bg-slate-100 px-3 py-1 rounded">IGR-XXXXXX</span></p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Dashboard normal
+            const totalMembros = membros.filter(m => m.igrejaId === userIgreja.id).length;
+            const totalCultos = cultos.filter(c => c.igrejaId === userIgreja.id).length;
+            const cultosPublicados = cultos.filter(c => c.igrejaId === userIgreja.id && c.status === 'publicada').length;
+            
+            container.innerHTML = `
+                <div class="max-w-7xl mx-auto">
+                    <div class="mb-6 md:mb-8">
+                        <h1 class="text-2xl md:text-4xl font-bold text-slate-900">Bem-vindo, ${state.currentUser.nome}! 👋</h1>
+                        <p class="text-slate-500 text-sm md:text-base">🏛️ ${userIgreja.nome}</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-10">
+                        <div class="bg-white rounded-2xl md:rounded-3xl p-4 md:p-6 card-hover border border-slate-100">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <div class="text-2xl md:text-4xl font-bold text-orange-500">${totalCultos}</div>
+                                    <div class="text-xs md:text-sm text-slate-500 font-medium">Cultos</div>
+                                </div>
+                                <i class="fa-solid fa-calendar text-2xl md:text-4xl text-orange-200"></i>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-2xl md:rounded-3xl p-4 md:p-6 card-hover border border-slate-100">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <div class="text-2xl md:text-4xl font-bold text-emerald-500">${cultosPublicados}</div>
+                                    <div class="text-xs md:text-sm text-slate-500 font-medium">Publicados</div>
+                                </div>
+                                <i class="fa-solid fa-check-circle text-2xl md:text-4xl text-emerald-200"></i>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-2xl md:rounded-3xl p-4 md:p-6 card-hover border border-slate-100">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <div class="text-2xl md:text-4xl font-bold text-purple-500">${totalMembros}</div>
+                                    <div class="text-xs md:text-sm text-slate-500 font-medium">Membros</div>
+                                </div>
+                                <i class="fa-solid fa-users text-2xl md:text-4xl text-purple-200"></i>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-2xl md:rounded-3xl p-4 md:p-6 card-hover border border-slate-100">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <div class="text-2xl md:text-4xl font-bold text-amber-500">${igrejas.length}</div>
+                                    <div class="text-xs md:text-sm text-slate-500 font-medium">Igrejas</div>
+                                </div>
+                                <i class="fa-solid fa-church text-2xl md:text-4xl text-amber-200"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg md:text-xl font-semibold">Próximos Cultos</h2>
+                        <button onclick="navigateTo('all-scales')" class="text-sm text-orange-500 hover:text-orange-600 font-medium">
+                            Ver todos <i class="fa-solid fa-arrow-right ml-1"></i>
+                        </button>
+                    </div>
+                    <div id="upcoming-list" class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6"></div>
+                </div>
+            `;
+            renderUpcoming();
+        }
+
+        function renderUpcoming() {
+            const container = document.getElementById("upcoming-list");
+            if (!container) return;
+            
+            const userIgrejaId = state.currentUser.igrejaId;
+            const upcoming = cultos
+                .filter(c => c.igrejaId === userIgrejaId && c.status === 'publicada')
+                .slice(0, 4);
+            
+            if (upcoming.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-12 text-slate-400">
+                        <i class="fa-solid fa-calendar-plus text-4xl mb-3 block"></i>
+                        <p>Nenhum culto programado.</p>
+                        ${state.isAdmin ? '<p class="text-sm">Crie seu primeiro culto no painel admin.</p>' : ''}
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = upcoming.map(culto => {
+                const assignedCount = Object.values(culto.escalas).filter(v => v !== null).length;
+                const totalPositions = Object.keys(culto.escalas).length;
+                const filled = totalPositions > 0 ? Math.round((assignedCount / totalPositions) * 100) : 0;
+                
+                return `
+                    <div class="bg-white rounded-2xl md:rounded-3xl p-4 md:p-6 card-hover border border-slate-100">
+                        <div class="flex justify-between items-start gap-2">
+                            <div class="min-w-0">
+                                <div class="font-semibold text-sm md:text-base truncate">${culto.tipo}</div>
+                                <div class="text-xs md:text-sm text-slate-500">
+                                    ${new Date(culto.data).toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric', month: 'short' })} • ${culto.horario}
+                                </div>
+                            </div>
+                            <span class="status-badge flex-shrink-0 bg-emerald-100 text-emerald-700">✅ Publicada</span>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <div class="flex justify-between text-xs text-slate-500 mb-1">
+                                <span>Preenchimento</span>
+                                <span>${filled}%</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                <div class="h-full bg-orange-500 rounded-full transition-all duration-500" style="width: ${filled}%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 grid grid-cols-2 gap-2 text-xs md:text-sm">
+                            ${Object.entries(culto.escalas).slice(0, 4).map(([pos, id]) => `
+                                <div class="flex items-center gap-1.5 min-w-0">
+                                    <span class="text-orange-500 text-xs flex-shrink-0">•</span>
+                                    <span class="text-slate-500 truncate">${pos}:</span>
+                                    <span class="font-medium truncate ${id ? 'text-slate-700' : 'text-red-400'}">
+                                        ${id ? getMemberName(id) : 'Vago'}
+                                    </span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderAllScales() {
+            const container = document.getElementById("main-content");
+            const userIgrejaId = state.currentUser.igrejaId;
+            const igrejaCultos = cultos.filter(c => c.igrejaId === userIgrejaId);
+            
+            container.innerHTML = `
+                <div class="max-w-7xl mx-auto">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                        <h2 class="text-xl md:text-2xl font-semibold">Todas as Escalas</h2>
+                        <div class="flex gap-2 w-full sm:w-auto">
+                            <select id="filter-status" onchange="filterScales()" 
+                                    class="flex-1 sm:flex-none border border-slate-200 rounded-2xl px-4 py-2 text-sm focus:outline-none focus:border-orange-400 bg-white">
+                                <option value="all">Todos</option>
+                                <option value="publicada">Publicados</option>
+                                <option value="rascunho">Rascunhos</option>
+                            </select>
+                            ${state.isAdmin ? `
+                            <button onclick="addNewCulto()" 
+                                    class="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-2xl text-sm font-medium btn-touch whitespace-nowrap">
+                                <i class="fa-solid fa-plus"></i>
+                                <span class="hidden sm:inline">Novo</span>
+                            </button>` : ''}
+                        </div>
+                    </div>
+                    <div id="scales-list" class="space-y-4 md:space-y-6"></div>
+                </div>
+            `;
+            
+            if (igrejaCultos.length === 0) {
+                document.getElementById('scales-list').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fa-regular fa-calendar"></i>
+                        <h3>Nenhum culto cadastrado</h3>
+                        <p>${state.isAdmin ? 'Clique em "Novo" para criar seu primeiro culto.' : 'Aguardando criação de cultos.'}</p>
+                    </div>
+                `;
+            } else {
+                renderScalesList('all');
+            }
+        }
+
+        function renderScalesList(filter) {
+            const container = document.getElementById("scales-list");
+            if (!container) return;
+            
+            const userIgrejaId = state.currentUser.igrejaId;
+            let filtered = cultos.filter(c => c.igrejaId === userIgrejaId);
+            if (filter !== 'all') {
+                filtered = filtered.filter(c => c.status === filter);
+            }
+            
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fa-regular fa-inbox"></i>
+                        <h3>Nenhum culto encontrado</h3>
+                        <p>${filter !== 'all' ? 'Tente outro filtro.' : ''}</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = filtered.map(culto => {
+                const assignedCount = Object.values(culto.escalas).filter(v => v !== null).length;
+                const totalPositions = Object.keys(culto.escalas).length;
+                
+                return `
+                    <div class="bg-white rounded-2xl md:rounded-3xl p-4 md:p-8 card-hover border border-slate-100">
+                        <div class="flex flex-col sm:flex-row justify-between gap-3">
+                            <div>
+                                <div class="font-semibold text-base md:text-xl">${culto.tipo}</div>
+                                <div class="text-sm md:text-base text-slate-500">
+                                    ${new Date(culto.data).toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })} • ${culto.horario}
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span class="status-badge ${culto.status === 'publicada' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">
+                                    ${culto.status === 'publicada' ? '✅ Publicada' : '✏️ Rascunho'}
+                                </span>
+                                <span class="text-xs text-slate-400">${assignedCount}/${totalPositions}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+                            ${Object.entries(culto.escalas).map(([pos, id]) => {
+                                const member = id ? getMemberById(id) : null;
+                                return `
+                                    <div class="bg-slate-50 p-3 md:p-4 rounded-2xl">
+                                        <div class="text-xs text-slate-500 mb-1 truncate">${pos}</div>
+                                        <div class="flex items-center gap-2">
+                                            ${member ? `
+                                            <img src="${member.foto}" class="w-8 h-8 md:w-9 md:h-9 rounded-2xl object-cover ring-2 ring-orange-100 flex-shrink-0">
+                                            <div class="min-w-0">
+                                                <div class="font-medium text-xs md:text-sm truncate">${member.nome}</div>
+                                            </div>` : `
+                                            <div class="text-red-400 text-xs md:text-sm font-medium flex items-center gap-1.5">
+                                                <i class="fa-solid fa-circle-exclamation text-xs"></i>
+                                                <span class="truncate">Vago</span>
+                                            </div>`}
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                        
+                        ${state.isAdmin ? `
+                        <div class="flex flex-col sm:flex-row gap-3 mt-6">
+                            <button onclick="editCulto(${culto.id})" 
+                                    class="flex-1 py-3 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-2xl btn-touch transition-colors">
+                                <i class="fa-solid fa-pencil mr-2"></i> Editar
+                            </button>
+                            <button onclick="toggleCultoStatus(${culto.id})" 
+                                    class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-2xl btn-touch transition-colors">
+                                ${culto.status === 'publicada' ? '📄 Rascunho' : '✅ Publicar'}
+                            </button>
+                            ${culto.status === 'publicada' ? `
+                            <button onclick="sendScaleNotifications(${culto.id})" 
+                                    class="flex-1 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-2xl btn-touch transition-colors">
+                                <i class="fa-solid fa-bell mr-2"></i> Notificar
+                            </button>` : ''}
+                        </div>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function filterScales() {
+            const filter = document.getElementById('filter-status').value;
+            renderScalesList(filter);
+        }
+
+        function renderMyScales() {
+            const container = document.getElementById("main-content");
+            const userIgrejaId = state.currentUser.igrejaId;
+            const userCultos = cultos.filter(culto => {
+                return culto.igrejaId === userIgrejaId && 
+                       Object.values(culto.escalas).includes(state.currentUser.id);
+            });
+            
+            container.innerHTML = `
+                <div class="max-w-7xl mx-auto">
+                    <h2 class="text-xl md:text-2xl font-semibold mb-6">Minhas Escalas</h2>
+                    ${userCultos.length > 0 ? `
+                    <div class="space-y-4 md:space-y-6">
+                        ${userCultos.map(culto => {
+                            const userPositions = Object.entries(culto.escalas)
+                                .filter(([pos, id]) => id === state.currentUser.id)
+                                .map(([pos]) => pos);
+                            
+                            const notif = notifications.find(n => 
+                                n.cultoId === culto.id && 
+                                n.userId === state.currentUser.id
+                            );
+                            
+                            let statusText = 'Pendente';
+                            let statusColor = 'bg-amber-100 text-amber-700';
+                            if (notif?.status === 'confirmed') {
+                                statusText = '✅ Confirmada';
+                                statusColor = 'bg-emerald-100 text-emerald-700';
+                            } else if (notif?.status === 'replaced') {
+                                statusText = '🔄 Substituída';
+                                statusColor = 'bg-orange-100 text-orange-700';
+                            }
+                            
+                            return `
+                                <div class="bg-white rounded-2xl md:rounded-3xl p-4 md:p-8 card-hover border border-slate-100">
+                                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                                        <div>
+                                            <div class="font-semibold text-base md:text-xl">${culto.tipo}</div>
+                                            <div class="text-sm text-slate-500">
+                                                ${new Date(culto.data).toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })} • ${culto.horario}
+                                            </div>
+                                            <div class="mt-2 flex flex-wrap gap-1.5">
+                                                ${userPositions.map(pos => `
+                                                    <span class="bg-orange-100 text-orange-700 text-xs px-3 py-1 rounded-full font-medium">${pos}</span>
+                                                `).join('')}
+                                            </div>
+                                        </div>
+                                        <div class="flex flex-col items-end gap-2">
+                                            <span class="status-badge ${statusColor}">${statusText}</span>
+                                            ${notif?.status === 'pending' ? `
+                                            <div class="flex gap-2">
+                                                <button onclick="confirmNotification(${notif.id})" 
+                                                        class="px-4 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-medium btn-touch">
+                                                    <i class="fa-solid fa-check"></i> Confirmar
+                                                </button>
+                                                <button onclick="replaceNotification(${notif.id})" 
+                                                        class="px-4 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-medium btn-touch">
+                                                    <i class="fa-solid fa-rotate"></i> Substituir
+                                                </button>
+                                            </div>` : ''}
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>` : `
+                    <div class="empty-state">
+                        <i class="fa-regular fa-calendar-xmark"></i>
+                        <h3>Nenhuma escala atribuída</h3>
+                        <p>Você será notificado quando for escalado.</p>
+                    </div>`}
+                </div>
+            `;
+        }
+
+        function renderTeam() {
+            const container = document.getElementById("main-content");
+            const userIgrejaId = state.currentUser.igrejaId;
+            const teamMembers = membros.filter(m => m.igrejaId === userIgrejaId);
+            
+            container.innerHTML = `
+                <div class="max-w-7xl mx-auto">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl md:text-2xl font-semibold">Equipe de Mídia</h2>
+                        <span class="text-sm text-slate-500">${teamMembers.length} membros</span>
+                    </div>
+                    ${teamMembers.length > 0 ? `
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+                        ${teamMembers.map(member => `
+                            <div class="bg-white rounded-2xl md:rounded-3xl p-4 md:p-6 card-hover border border-slate-100">
+                                <div class="flex items-center gap-3 md:gap-4">
+                                    <img src="${member.foto}" class="w-14 h-14 md:w-16 md:h-16 rounded-2xl md:rounded-3xl object-cover ring-2 ring-orange-100 flex-shrink-0">
+                                    <div class="min-w-0 flex-1">
+                                        <div class="font-semibold text-sm md:text-base truncate">${member.nome}</div>
+                                        <div class="text-xs md:text-sm text-slate-500 truncate">${member.funcao}</div>
+                                        <a href="https://wa.me/55${member.telefone.replace(/\D/g,'')}" target="_blank" 
+                                           class="inline-block text-xs text-emerald-600 hover:text-emerald-700 font-medium mt-1 transition-colors">
+                                            <i class="fa-brands fa-whatsapp mr-1"></i>
+                                            ${member.telefone}
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>` : `
+                    <div class="empty-state">
+                        <i class="fa-regular fa-users"></i>
+                        <h3>Nenhum membro na equipe</h3>
+                        <p>Os membros aparecerão aqui quando se cadastrarem com o código da sua igreja.</p>
+                        ${state.isAdmin ? `<p class="text-sm text-orange-500 mt-2">Compartilhe o código da igreja para os membros se cadastrarem.</p>` : ''}
+                    </div>`}
+                </div>
+            `;
+        }
+
+        function renderAdminPanel() {
+            const container = document.getElementById("main-content");
+            const userIgreja = igrejas.find(i => i.id === state.currentUser.igrejaId);
+            const adminCount = usuarios.filter(u => u.isAdmin && u.igrejaId === state.currentUser.igrejaId).length;
+            
+            container.innerHTML = `
+                <div class="max-w-7xl mx-auto">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+                        <div>
+                            <h2 class="text-xl md:text-2xl font-semibold">Painel Administrativo</h2>
+                            <p class="text-sm text-slate-500">${adminCount} administradores • ${userIgreja ? `🏛️ ${userIgreja.nome}` : 'Sem igreja'}</p>
+                        </div>
+                        <div class="flex gap-3 w-full sm:w-auto flex-wrap">
+                            ${!userIgreja && state.currentUser.isMaster ? `
+                            <button onclick="createIgreja()" 
+                                    class="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-2xl font-medium btn-touch transition-colors">
+                                <i class="fa-solid fa-church"></i>
+                                Criar Igreja
+                            </button>` : ''}
+                            <button onclick="openAdminUsersModal()" 
+                                    class="flex items-center gap-2 bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-2xl font-medium btn-touch transition-colors">
+                                <i class="fa-solid fa-users-gear"></i>
+                                Gerenciar Admins
+                            </button>
+                            <button onclick="addNewCulto()" 
+                                    class="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-2xl font-medium btn-touch transition-colors">
+                                <i class="fa-solid fa-plus"></i>
+                                Novo Culto
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+                        <div onclick="navigateTo('all-scales')" 
+                             class="bg-white p-6 md:p-8 rounded-3xl border-2 border-orange-100 hover:border-orange-300 cursor-pointer transition-all card-hover">
+                            <i class="fa-solid fa-list text-3xl text-orange-500 mb-3 block"></i>
+                            <h3 class="font-semibold text-lg">Gerenciar Escalas</h3>
+                            <p class="text-sm text-slate-500 mt-1">Crie e edite escalas</p>
+                        </div>
+                        
+                        <div onclick="navigateTo('team')" 
+                             class="bg-white p-6 md:p-8 rounded-3xl border-2 border-blue-100 hover:border-blue-300 cursor-pointer transition-all card-hover">
+                            <i class="fa-solid fa-users text-3xl text-blue-500 mb-3 block"></i>
+                            <h3 class="font-semibold text-lg">Equipe</h3>
+                            <p class="text-sm text-slate-500 mt-1">Visualize os membros</p>
+                        </div>
+                        
+                        <div onclick="openAdminUsersModal()" 
+                             class="bg-white p-6 md:p-8 rounded-3xl border-2 border-purple-100 hover:border-purple-300 cursor-pointer transition-all card-hover">
+                            <i class="fa-solid fa-users-gear text-3xl text-purple-500 mb-3 block"></i>
+                            <h3 class="font-semibold text-lg">Administradores</h3>
+                            <p class="text-sm text-slate-500 mt-1">Gerencie quem é admin</p>
+                        </div>
+                    </div>
+                    
+                    ${userIgreja ? `
+                    <div class="mt-8 bg-slate-50 border border-slate-200 rounded-3xl p-4 md:p-6">
+                        <div class="flex items-start gap-3">
+                            <i class="fa-solid fa-info-circle text-blue-500 text-xl mt-0.5"></i>
+                            <div>
+                                <h4 class="font-semibold text-slate-700">Informações da Igreja</h4>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2 text-sm">
+                                    <div><span class="text-slate-500">Nome:</span> <span class="font-medium">${userIgreja.nome}</span></div>
+                                    <div><span class="text-slate-500">Código:</span> <span class="font-mono bg-white px-2 py-0.5 rounded border">${userIgreja.codigo}</span></div>
+                                    ${userIgreja.endereco ? `<div><span class="text-slate-500">Endereço:</span> ${userIgreja.endereco}</div>` : ''}
+                                    ${userIgreja.pastor ? `<div><span class="text-slate-500">Pastor/Líder:</span> ${userIgreja.pastor}</div>` : ''}
+                                    <div><span class="text-slate-500">Membros:</span> ${membros.filter(m => m.igrejaId === userIgreja.id).length}</div>
+                                    <div><span class="text-slate-500">Cultos:</span> ${cultos.filter(c => c.igrejaId === userIgreja.id).length}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    ` : ''}
+                    
+                    <div class="mt-8 bg-amber-50 border border-amber-200 rounded-3xl p-4 md:p-6">
+                        <div class="flex items-start gap-3">
+                            <i class="fa-solid fa-lightbulb text-amber-500 text-xl mt-0.5"></i>
+                            <div>
+                                <h4 class="font-semibold text-amber-800">Dica Rápida</h4>
+                                <p class="text-sm text-amber-700">Após publicar uma escala, clique em "Notificar" para enviar alertas aos membros.</p>
+                                <p class="text-sm text-amber-700 mt-1">Compartilhe o <strong>código da igreja</strong> para que os membros possam se cadastrar.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ============================================
+        // FUNÇÕES AUXILIARES
+        // ============================================
+        function getMemberName(id) {
+            if (!id) return null;
+            const member = membros.find(m => m.id === id);
+            return member ? member.nome : null;
+        }
+
+        function getMemberById(id) {
+            return membros.find(m => m.id === id);
+        }
+
+        function addNewCulto() {
+            const userIgreja = igrejas.find(i => i.id === state.currentUser.igrejaId);
+            if (!userIgreja) {
+                showToast('⚠️ Você precisa ter uma igreja para criar cultos.', 'fa-exclamation-triangle');
+                if (state.currentUser.isMaster) {
+                    createIgreja();
+                }
+                return;
+            }
+            
+            const tipo = prompt('Digite o tipo do culto (ex: Culto de Domingo - Manhã):');
+            if (!tipo) return;
+            
+            const data = prompt('Digite a data (YYYY-MM-DD):', new Date().toISOString().split('T')[0]);
+            if (!data) return;
+            
+            const horario = prompt('Digite o horário (ex: 09:00):', '09:00');
+            if (!horario) return;
+            
+            // Pergunta se quer adicionar posições
+            const addPositions = confirm('Deseja adicionar posições agora?');
+            
+            let escalas = {};
+            if (addPositions) {
+                let continuar = true;
+                while (continuar) {
+                    const posicao = prompt('Digite o nome da posição (ex: Coordenação de Mídia) ou "fim" para terminar:');
+                    if (!posicao || posicao.toLowerCase() === 'fim') break;
+                    escalas[posicao] = null;
+                    continuar = confirm('Adicionar outra posição?');
+                }
+            } else {
+                escalas = {
+                    "Coordenação de Mídia": null,
+                    "Som Principal": null,
+                    "Projeção": null,
+                    "Livestream": null
+                };
+            }
+            
+            const newCulto = {
+                id: Date.now(),
+                igrejaId: state.currentUser.igrejaId,
+                data: data,
+                horario: horario,
+                tipo: tipo,
+                status: "rascunho",
+                escalas: escalas,
+                dataCriacao: new Date().toISOString()
+            };
+            cultos.push(newCulto);
+            saveData();
+            showToast("➕ Novo culto adicionado!", "fa-plus");
+            navigateTo("all-scales");
+        }
+
+        function toggleCultoStatus(id) {
+            const culto = cultos.find(c => c.id === id);
+            if (!culto) return;
+            
+            culto.status = culto.status === 'publicada' ? 'rascunho' : 'publicada';
+            saveData();
+            
+            if (culto.status === 'publicada') {
+                showToast('📨 Escala publicada! Notificações enviadas.', 'fa-bell');
+                sendScaleNotifications(id);
+            } else {
+                showToast('📄 Escala movida para rascunho.', 'fa-file');
+            }
+            
+            navigateTo("all-scales");
+        }
+
+        function editCulto(id) {
+            showToast('🛠️ Função de edição em desenvolvimento.', 'fa-edit');
         }
 
         // ============================================
@@ -952,10 +1609,10 @@
             
             if (userNotifs.length === 0) {
                 container.innerHTML = `
-                    <div class="text-center py-12 text-slate-400">
-                        <i class="fa-solid fa-bell-slash text-4xl mb-3 block"></i>
-                        <p>Nenhuma notificação</p>
-                        <p class="text-sm">Você será notificado quando for escalado</p>
+                    <div class="empty-state">
+                        <i class="fa-regular fa-bell-slash"></i>
+                        <h3>Sem notificações</h3>
+                        <p>Você será notificado quando for escalado</p>
                     </div>
                 `;
                 return;
@@ -1042,529 +1699,6 @@
         }
 
         // ============================================
-        // NAVEGAÇÃO
-        // ============================================
-        const navItems = [
-            { icon: "fa-house", label: "Início", id: "dashboard" },
-            { icon: "fa-calendar-check", label: "Minhas Escalas", id: "my-scales" },
-            { icon: "fa-list", label: "Todas as Escalas", id: "all-scales" },
-            { icon: "fa-users", label: "Equipe", id: "team" }
-        ];
-
-        function getNavItems() {
-            const items = [...navItems];
-            if (state.isAdmin) {
-                items.push({ icon: "fa-gear", label: "Admin", id: "admin" });
-            }
-            return items;
-        }
-
-        function renderSidebar() {
-            const container = document.getElementById("sidebar-menu");
-            const items = getNavItems();
-            
-            container.innerHTML = `
-                <nav class="space-y-1 px-2">
-                    ${items.map(item => `
-                        <div onclick="navigateTo('${item.id}')" 
-                             class="flex items-center gap-3 px-4 py-3.5 rounded-2xl cursor-pointer text-slate-600 hover:text-orange-600 transition-all group ${state.currentPage === item.id ? 'bg-orange-50 text-orange-600 font-semibold' : ''}"
-                             data-page="${item.id}">
-                            <i class="fa-solid ${item.icon} w-5 text-lg group-hover:scale-110 transition-transform"></i>
-                            <span class="font-medium">${item.label}</span>
-                            ${state.currentPage === item.id ? '<span class="ml-auto w-1.5 h-8 bg-orange-500 rounded-full"></span>' : ''}
-                        </div>
-                    `).join('')}
-                </nav>
-            `;
-        }
-
-        function navigateTo(page) {
-            state.currentPage = page;
-            const pageTitle = getNavItems().find(n => n.id === page)?.label || page;
-            document.getElementById("page-title").textContent = pageTitle;
-            
-            closeSidebar();
-            renderSidebar();
-            
-            const content = document.getElementById("main-content");
-            
-            switch(page) {
-                case "dashboard": renderDashboard(); break;
-                case "all-scales": renderAllScales(); break;
-                case "my-scales": renderMyScales(); break;
-                case "team": renderTeam(); break;
-                case "admin": renderAdminPanel(); break;
-                default: renderDashboard();
-            }
-        }
-
-        // ============================================
-        // PÁGINAS (versão simplificada)
-        // ============================================
-        function renderDashboard() {
-            const container = document.getElementById("main-content");
-            const totalCultos = cultos.length;
-            const totalMembros = membros.length;
-            const cultosPublicados = cultos.filter(c => c.status === 'publicada').length;
-            const vagas = cultos.reduce((acc, c) => {
-                return acc + Object.values(c.escalas).filter(v => v === null).length;
-            }, 0);
-            
-            container.innerHTML = `
-                <div class="max-w-7xl mx-auto">
-                    <div class="mb-6 md:mb-8">
-                        <h1 class="text-2xl md:text-4xl font-bold text-slate-900">Bem-vindo, ${state.currentUser.nome}! 👋</h1>
-                        <p class="text-slate-500 text-sm md:text-base">Aqui está o resumo das escalas.</p>
-                    </div>
-                    
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-10">
-                        <div class="bg-white rounded-2xl md:rounded-3xl p-4 md:p-6 card-hover border border-slate-100">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <div class="text-2xl md:text-4xl font-bold text-orange-500">${totalCultos}</div>
-                                    <div class="text-xs md:text-sm text-slate-500 font-medium">Cultos</div>
-                                </div>
-                                <i class="fa-solid fa-calendar text-2xl md:text-4xl text-orange-200"></i>
-                            </div>
-                        </div>
-                        <div class="bg-white rounded-2xl md:rounded-3xl p-4 md:p-6 card-hover border border-slate-100">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <div class="text-2xl md:text-4xl font-bold text-emerald-500">${cultosPublicados}</div>
-                                    <div class="text-xs md:text-sm text-slate-500 font-medium">Publicados</div>
-                                </div>
-                                <i class="fa-solid fa-check-circle text-2xl md:text-4xl text-emerald-200"></i>
-                            </div>
-                        </div>
-                        <div class="bg-white rounded-2xl md:rounded-3xl p-4 md:p-6 card-hover border border-slate-100">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <div class="text-2xl md:text-4xl font-bold text-amber-500">${vagas}</div>
-                                    <div class="text-xs md:text-sm text-slate-500 font-medium">Vagas</div>
-                                </div>
-                                <i class="fa-solid fa-user-plus text-2xl md:text-4xl text-amber-200"></i>
-                            </div>
-                        </div>
-                        <div class="bg-white rounded-2xl md:rounded-3xl p-4 md:p-6 card-hover border border-slate-100">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <div class="text-2xl md:text-4xl font-bold text-purple-500">${totalMembros}</div>
-                                    <div class="text-xs md:text-sm text-slate-500 font-medium">Membros</div>
-                                </div>
-                                <i class="fa-solid fa-users text-2xl md:text-4xl text-purple-200"></i>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-lg md:text-xl font-semibold">Próximos Cultos</h2>
-                        <button onclick="navigateTo('all-scales')" class="text-sm text-orange-500 hover:text-orange-600 font-medium">
-                            Ver todos <i class="fa-solid fa-arrow-right ml-1"></i>
-                        </button>
-                    </div>
-                    <div id="upcoming-list" class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6"></div>
-                </div>
-            `;
-            renderUpcoming();
-        }
-
-        function renderUpcoming() {
-            const container = document.getElementById("upcoming-list");
-            if (!container) return;
-            
-            const upcoming = cultos.filter(c => c.status === 'publicada').slice(0, 4);
-            if (upcoming.length === 0) {
-                container.innerHTML = `
-                    <div class="col-span-full text-center py-12 text-slate-400">
-                        <i class="fa-solid fa-calendar-plus text-4xl mb-3 block"></i>
-                        <p>Nenhum culto programado.</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            container.innerHTML = upcoming.map(culto => {
-                const assignedCount = Object.values(culto.escalas).filter(v => v !== null).length;
-                const totalPositions = Object.keys(culto.escalas).length;
-                const filled = Math.round((assignedCount / totalPositions) * 100);
-                
-                return `
-                    <div class="bg-white rounded-2xl md:rounded-3xl p-4 md:p-6 card-hover border border-slate-100">
-                        <div class="flex justify-between items-start gap-2">
-                            <div class="min-w-0">
-                                <div class="font-semibold text-sm md:text-base truncate">${culto.tipo}</div>
-                                <div class="text-xs md:text-sm text-slate-500">
-                                    ${new Date(culto.data).toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric', month: 'short' })} • ${culto.horario}
-                                </div>
-                            </div>
-                            <span class="status-badge flex-shrink-0 bg-emerald-100 text-emerald-700">✅ Publicada</span>
-                        </div>
-                        
-                        <div class="mt-3">
-                            <div class="flex justify-between text-xs text-slate-500 mb-1">
-                                <span>Preenchimento</span>
-                                <span>${filled}%</span>
-                            </div>
-                            <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                                <div class="h-full bg-orange-500 rounded-full transition-all duration-500" style="width: ${filled}%"></div>
-                            </div>
-                        </div>
-                        
-                        <div class="mt-4 grid grid-cols-2 gap-2 text-xs md:text-sm">
-                            ${Object.entries(culto.escalas).slice(0, 4).map(([pos, id]) => `
-                                <div class="flex items-center gap-1.5 min-w-0">
-                                    <span class="text-orange-500 text-xs flex-shrink-0">•</span>
-                                    <span class="text-slate-500 truncate">${pos}:</span>
-                                    <span class="font-medium truncate ${id ? 'text-slate-700' : 'text-red-400'}">
-                                        ${id ? getMemberName(id) : 'Vago'}
-                                    </span>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function renderAllScales() {
-            const container = document.getElementById("main-content");
-            
-            container.innerHTML = `
-                <div class="max-w-7xl mx-auto">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                        <h2 class="text-xl md:text-2xl font-semibold">Todas as Escalas</h2>
-                        <div class="flex gap-2 w-full sm:w-auto">
-                            <select id="filter-status" onchange="filterScales()" 
-                                    class="flex-1 sm:flex-none border border-slate-200 rounded-2xl px-4 py-2 text-sm focus:outline-none focus:border-orange-400 bg-white">
-                                <option value="all">Todos</option>
-                                <option value="publicada">Publicados</option>
-                                <option value="rascunho">Rascunhos</option>
-                            </select>
-                            ${state.isAdmin ? `
-                            <button onclick="addNewCulto()" 
-                                    class="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-2xl text-sm font-medium btn-touch whitespace-nowrap">
-                                <i class="fa-solid fa-plus"></i>
-                                <span class="hidden sm:inline">Novo</span>
-                            </button>` : ''}
-                        </div>
-                    </div>
-                    <div id="scales-list" class="space-y-4 md:space-y-6"></div>
-                </div>
-            `;
-            renderScalesList('all');
-        }
-
-        function renderScalesList(filter) {
-            const container = document.getElementById("scales-list");
-            if (!container) return;
-            
-            let filtered = cultos;
-            if (filter !== 'all') {
-                filtered = cultos.filter(c => c.status === filter);
-            }
-            
-            if (filtered.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-12 text-slate-400">
-                        <i class="fa-solid fa-inbox text-4xl mb-3 block"></i>
-                        <p>Nenhum culto encontrado.</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            container.innerHTML = filtered.map(culto => {
-                const assignedCount = Object.values(culto.escalas).filter(v => v !== null).length;
-                const totalPositions = Object.keys(culto.escalas).length;
-                
-                return `
-                    <div class="bg-white rounded-2xl md:rounded-3xl p-4 md:p-8 card-hover border border-slate-100">
-                        <div class="flex flex-col sm:flex-row justify-between gap-3">
-                            <div>
-                                <div class="font-semibold text-base md:text-xl">${culto.tipo}</div>
-                                <div class="text-sm md:text-base text-slate-500">
-                                    ${new Date(culto.data).toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })} • ${culto.horario}
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-2 flex-wrap">
-                                <span class="status-badge ${culto.status === 'publicada' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">
-                                    ${culto.status === 'publicada' ? '✅ Publicada' : '✏️ Rascunho'}
-                                </span>
-                                <span class="text-xs text-slate-400">${assignedCount}/${totalPositions}</span>
-                            </div>
-                        </div>
-                        
-                        <div class="mt-6 grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
-                            ${Object.entries(culto.escalas).map(([pos, id]) => {
-                                const member = id ? getMemberById(id) : null;
-                                return `
-                                    <div class="bg-slate-50 p-3 md:p-4 rounded-2xl">
-                                        <div class="text-xs text-slate-500 mb-1 truncate">${pos}</div>
-                                        <div class="flex items-center gap-2">
-                                            ${member ? `
-                                            <img src="${member.foto}" class="w-8 h-8 md:w-9 md:h-9 rounded-2xl object-cover ring-2 ring-orange-100 flex-shrink-0">
-                                            <div class="min-w-0">
-                                                <div class="font-medium text-xs md:text-sm truncate">${member.nome}</div>
-                                            </div>` : `
-                                            <div class="text-red-400 text-xs md:text-sm font-medium flex items-center gap-1.5">
-                                                <i class="fa-solid fa-circle-exclamation text-xs"></i>
-                                                <span class="truncate">Vago</span>
-                                            </div>`}
-                                        </div>
-                                    </div>
-                                `;
-                            }).join('')}
-                        </div>
-                        
-                        ${state.isAdmin ? `
-                        <div class="flex flex-col sm:flex-row gap-3 mt-6">
-                            <button onclick="editCulto(${culto.id})" 
-                                    class="flex-1 py-3 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-2xl btn-touch transition-colors">
-                                <i class="fa-solid fa-pencil mr-2"></i> Editar
-                            </button>
-                            <button onclick="toggleCultoStatus(${culto.id})" 
-                                    class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-2xl btn-touch transition-colors">
-                                ${culto.status === 'publicada' ? '📄 Rascunho' : '✅ Publicar'}
-                            </button>
-                            ${culto.status === 'publicada' ? `
-                            <button onclick="sendScaleNotifications(${culto.id})" 
-                                    class="flex-1 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-2xl btn-touch transition-colors">
-                                <i class="fa-solid fa-bell mr-2"></i> Notificar
-                            </button>` : ''}
-                        </div>` : ''}
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function filterScales() {
-            const filter = document.getElementById('filter-status').value;
-            renderScalesList(filter);
-        }
-
-        function renderMyScales() {
-            const container = document.getElementById("main-content");
-            const userCultos = cultos.filter(culto => {
-                return Object.values(culto.escalas).includes(state.currentUser.id);
-            });
-            
-            container.innerHTML = `
-                <div class="max-w-7xl mx-auto">
-                    <h2 class="text-xl md:text-2xl font-semibold mb-6">Minhas Escalas</h2>
-                    ${userCultos.length > 0 ? `
-                    <div class="space-y-4 md:space-y-6">
-                        ${userCultos.map(culto => {
-                            const userPositions = Object.entries(culto.escalas)
-                                .filter(([pos, id]) => id === state.currentUser.id)
-                                .map(([pos]) => pos);
-                            
-                            const notif = notifications.find(n => 
-                                n.cultoId === culto.id && 
-                                n.userId === state.currentUser.id
-                            );
-                            
-                            let statusText = 'Pendente';
-                            let statusColor = 'bg-amber-100 text-amber-700';
-                            if (notif?.status === 'confirmed') {
-                                statusText = '✅ Confirmada';
-                                statusColor = 'bg-emerald-100 text-emerald-700';
-                            } else if (notif?.status === 'replaced') {
-                                statusText = '🔄 Substituída';
-                                statusColor = 'bg-orange-100 text-orange-700';
-                            }
-                            
-                            return `
-                                <div class="bg-white rounded-2xl md:rounded-3xl p-4 md:p-8 card-hover border border-slate-100">
-                                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                                        <div>
-                                            <div class="font-semibold text-base md:text-xl">${culto.tipo}</div>
-                                            <div class="text-sm text-slate-500">
-                                                ${new Date(culto.data).toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })} • ${culto.horario}
-                                            </div>
-                                            <div class="mt-2 flex flex-wrap gap-1.5">
-                                                ${userPositions.map(pos => `
-                                                    <span class="bg-orange-100 text-orange-700 text-xs px-3 py-1 rounded-full font-medium">${pos}</span>
-                                                `).join('')}
-                                            </div>
-                                        </div>
-                                        <div class="flex flex-col items-end gap-2">
-                                            <span class="status-badge ${statusColor}">${statusText}</span>
-                                            ${notif?.status === 'pending' ? `
-                                            <div class="flex gap-2">
-                                                <button onclick="confirmNotification(${notif.id})" 
-                                                        class="px-4 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-medium btn-touch">
-                                                    <i class="fa-solid fa-check"></i> Confirmar
-                                                </button>
-                                                <button onclick="replaceNotification(${notif.id})" 
-                                                        class="px-4 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-medium btn-touch">
-                                                    <i class="fa-solid fa-rotate"></i> Substituir
-                                                </button>
-                                            </div>` : ''}
-                                        </div>
-                                    </div>
-                                </div>
-                            `;
-                        }).join('')}
-                    </div>` : `
-                    <div class="text-center py-16 text-slate-400">
-                        <i class="fa-solid fa-calendar-xmark text-5xl mb-4 block"></i>
-                        <p class="text-lg">Nenhuma escala atribuída.</p>
-                        <p class="text-sm">Você será notificado quando for escalado.</p>
-                    </div>`}
-                </div>
-            `;
-        }
-
-        function renderTeam() {
-            const container = document.getElementById("main-content");
-            
-            container.innerHTML = `
-                <div class="max-w-7xl mx-auto">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-xl md:text-2xl font-semibold">Equipe de Mídia</h2>
-                        <span class="text-sm text-slate-500">${membros.length} membros</span>
-                    </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-                        ${membros.map(member => `
-                            <div class="bg-white rounded-2xl md:rounded-3xl p-4 md:p-6 card-hover border border-slate-100">
-                                <div class="flex items-center gap-3 md:gap-4">
-                                    <img src="${member.foto}" class="w-14 h-14 md:w-16 md:h-16 rounded-2xl md:rounded-3xl object-cover ring-2 ring-orange-100 flex-shrink-0">
-                                    <div class="min-w-0 flex-1">
-                                        <div class="font-semibold text-sm md:text-base truncate">${member.nome}</div>
-                                        <div class="text-xs md:text-sm text-slate-500 truncate">${member.funcao}</div>
-                                        <a href="https://wa.me/55${member.telefone.replace(/\D/g,'')}" target="_blank" 
-                                           class="inline-block text-xs text-emerald-600 hover:text-emerald-700 font-medium mt-1 transition-colors">
-                                            <i class="fa-brands fa-whatsapp mr-1"></i>
-                                            ${member.telefone}
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            `;
-        }
-
-        function renderAdminPanel() {
-            const container = document.getElementById("main-content");
-            const adminCount = usuarios.filter(u => u.isAdmin).length;
-            
-            container.innerHTML = `
-                <div class="max-w-7xl mx-auto">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-                        <div>
-                            <h2 class="text-xl md:text-2xl font-semibold">Painel Administrativo</h2>
-                            <p class="text-sm text-slate-500">${adminCount} administradores ativos</p>
-                        </div>
-                        <div class="flex gap-3 w-full sm:w-auto">
-                            <button onclick="openAdminUsersModal()" 
-                                    class="flex items-center gap-2 bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-2xl font-medium btn-touch transition-colors w-full sm:w-auto justify-center">
-                                <i class="fa-solid fa-users-gear"></i>
-                                Gerenciar Admins
-                            </button>
-                            <button onclick="addNewCulto()" 
-                                    class="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-2xl font-medium btn-touch transition-colors w-full sm:w-auto justify-center">
-                                <i class="fa-solid fa-plus"></i>
-                                Novo Culto
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-                        <div onclick="navigateTo('all-scales')" 
-                             class="bg-white p-6 md:p-8 rounded-3xl border-2 border-orange-100 hover:border-orange-300 cursor-pointer transition-all card-hover">
-                            <i class="fa-solid fa-list text-3xl text-orange-500 mb-3 block"></i>
-                            <h3 class="font-semibold text-lg">Gerenciar Escalas</h3>
-                            <p class="text-sm text-slate-500 mt-1">Crie e edite escalas</p>
-                        </div>
-                        
-                        <div onclick="navigateTo('team')" 
-                             class="bg-white p-6 md:p-8 rounded-3xl border-2 border-blue-100 hover:border-blue-300 cursor-pointer transition-all card-hover">
-                            <i class="fa-solid fa-users text-3xl text-blue-500 mb-3 block"></i>
-                            <h3 class="font-semibold text-lg">Equipe</h3>
-                            <p class="text-sm text-slate-500 mt-1">Visualize os membros</p>
-                        </div>
-                        
-                        <div onclick="openAdminUsersModal()" 
-                             class="bg-white p-6 md:p-8 rounded-3xl border-2 border-purple-100 hover:border-purple-300 cursor-pointer transition-all card-hover">
-                            <i class="fa-solid fa-users-gear text-3xl text-purple-500 mb-3 block"></i>
-                            <h3 class="font-semibold text-lg">Administradores</h3>
-                            <p class="text-sm text-slate-500 mt-1">Gerencie quem é admin</p>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-8 bg-amber-50 border border-amber-200 rounded-3xl p-4 md:p-6">
-                        <div class="flex items-start gap-3">
-                            <i class="fa-solid fa-lightbulb text-amber-500 text-xl mt-0.5"></i>
-                            <div>
-                                <h4 class="font-semibold text-amber-800">Dica Rápida</h4>
-                                <p class="text-sm text-amber-700">Após publicar uma escala, clique em "Notificar" para enviar alertas aos membros.</p>
-                                <p class="text-sm text-amber-700 mt-1">Você pode tornar outros usuários administradores no botão "Gerenciar Admins".</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        // ============================================
-        // FUNÇÕES AUXILIARES
-        // ============================================
-        function getMemberName(id) {
-            if (!id) return null;
-            const member = membros.find(m => m.id === id);
-            return member ? member.nome : null;
-        }
-
-        function getMemberById(id) {
-            return membros.find(m => m.id === id);
-        }
-
-        function addNewCulto() {
-            const newCulto = {
-                id: Date.now(),
-                data: new Date().toISOString().split('T')[0],
-                horario: "09:00",
-                tipo: "Novo Culto - " + new Date().toLocaleDateString('pt-BR'),
-                status: "rascunho",
-                escalas: {
-                    "Coordenação de Mídia": null,
-                    "Som Principal": null,
-                    "Projeção": null,
-                    "Livestream": null,
-                    "Fotografia": null,
-                    "Iluminação": null
-                }
-            };
-            cultos.unshift(newCulto);
-            saveData();
-            showToast("➕ Novo culto adicionado!", "fa-plus");
-            navigateTo("all-scales");
-        }
-
-        function toggleCultoStatus(id) {
-            const culto = cultos.find(c => c.id === id);
-            if (!culto) return;
-            
-            culto.status = culto.status === 'publicada' ? 'rascunho' : 'publicada';
-            saveData();
-            
-            if (culto.status === 'publicada') {
-                showToast('📨 Escala publicada! Notificações enviadas.', 'fa-bell');
-                sendScaleNotifications(id);
-            } else {
-                showToast('📄 Escala movida para rascunho.', 'fa-file');
-            }
-            
-            navigateTo("all-scales");
-        }
-
-        function editCulto(id) {
-            showToast('🛠️ Função de edição em desenvolvimento.', 'fa-edit');
-        }
-
-        // ============================================
         // UI HELPERS
         // ============================================
         function showToast(message, icon = "fa-check-circle") {
@@ -1618,14 +1752,17 @@
                 return;
             }
             
+            const userIgrejaId = state.currentUser.igrejaId;
             const results = {
                 cultos: cultos.filter(c => 
-                    c.tipo.toLowerCase().includes(term.toLowerCase()) ||
-                    Object.keys(c.escalas).some(pos => pos.toLowerCase().includes(term.toLowerCase()))
+                    c.igrejaId === userIgrejaId &&
+                    (c.tipo.toLowerCase().includes(term.toLowerCase()) ||
+                    Object.keys(c.escalas).some(pos => pos.toLowerCase().includes(term.toLowerCase())))
                 ),
                 membros: membros.filter(m => 
-                    m.nome.toLowerCase().includes(term.toLowerCase()) ||
-                    m.funcao.toLowerCase().includes(term.toLowerCase())
+                    m.igrejaId === userIgrejaId &&
+                    (m.nome.toLowerCase().includes(term.toLowerCase()) ||
+                    m.funcao.toLowerCase().includes(term.toLowerCase()))
                 )
             };
             
@@ -1644,6 +1781,9 @@
         // INICIALIZAÇÃO
         // ============================================
         function initializeApp() {
+            loadData();
+            
+            // Se não há dados, inicializa vazio
             if (!loadData()) {
                 initDefaultData();
             }
@@ -1661,11 +1801,12 @@
             });
             
             console.log(`%c✅ ${CONFIG.APP_NAME} v${CONFIG.VERSION} carregado!`, "color: #FF6B00; font-weight: bold; font-size: 16px;");
-            console.log(`%c👑 Admin Master: ${CONFIG.MASTER_ADMIN_EMAIL}`, "color: #8b5cf6; font-weight: bold;");
+            console.log('%c🏛️ Sistema pronto para criar sua igreja!', "color: #8b5cf6; font-weight: bold;");
         }
 
-        // Inicia
+        // Inicia quando o DOM estiver pronto
         document.addEventListener('DOMContentLoaded', () => {
+            loadData();
             if (!loadData()) {
                 initDefaultData();
             }
