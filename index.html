@@ -1,0 +1,1675 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Escalas Mídia Adenf</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        
+        * {
+            font-family: 'Inter', system-ui, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #FF6B00;
+            border-radius: 10px;
+        }
+
+        .sidebar-mobile {
+            transform: translateX(-100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .sidebar-mobile.open {
+            transform: translateX(0);
+        }
+        .sidebar-overlay {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .sidebar-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .card-hover {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-hover:active {
+            transform: scale(0.98);
+        }
+        @media (hover: hover) {
+            .card-hover:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            }
+        }
+
+        .modal {
+            animation: modalPop 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        @keyframes modalPop {
+            from { opacity: 0; transform: scale(0.95) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .btn-touch {
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-touch::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(255,255,255,0.2);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .btn-touch:active::after {
+            opacity: 1;
+        }
+
+        .toast-show {
+            animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        .toast-hide {
+            animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes slideDown {
+            from { transform: translateY(0); opacity: 1; }
+            to { transform: translateY(100px); opacity: 0; }
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: 2px solid #FF6B00;
+            outline-offset: 2px;
+        }
+
+        @supports (padding: max(0px)) {
+            .safe-area-top {
+                padding-top: max(env(safe-area-inset-top), 0px);
+            }
+            .safe-area-bottom {
+                padding-bottom: max(env(safe-area-inset-bottom), 0px);
+            }
+        }
+
+        .auth-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #FF6B00 0%, #FF8C38 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .auth-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 32px;
+            padding: 40px;
+            max-width: 440px;
+            width: 100%;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        .auth-input {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s;
+            border-radius: 16px;
+            padding: 14px 16px;
+            width: 100%;
+            font-size: 15px;
+        }
+        .auth-input:focus {
+            border-color: #FF6B00;
+            box-shadow: 0 0 0 4px rgba(255, 107, 0, 0.1);
+        }
+        .auth-input.error {
+            border-color: #ef4444;
+            box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
+        }
+        .password-toggle {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #94a3b8;
+            transition: color 0.3s;
+            font-size: 18px;
+        }
+        .password-toggle:hover {
+            color: #FF6B00;
+        }
+        .auth-logo {
+            width: 72px;
+            height: 72px;
+            background: #FF6B00;
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: 800;
+            color: white;
+            margin: 0 auto 20px;
+            box-shadow: 0 8px 24px rgba(255, 107, 0, 0.3);
+        }
+
+        .notification-item {
+            border-left: 4px solid #FF6B00;
+            background: white;
+            transition: all 0.3s;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+        .notification-item:hover {
+            background: #f8fafc;
+        }
+        .notification-item.confirmed {
+            border-left-color: #22c55e;
+            opacity: 0.7;
+        }
+        .notification-item.replaced {
+            border-left-color: #f59e0b;
+            opacity: 0.7;
+        }
+        .notification-item .action-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .notification-item .action-buttons button {
+            flex: 1;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        .notification-item .action-buttons .btn-confirm {
+            background: #22c55e;
+            color: white;
+        }
+        .notification-item .action-buttons .btn-confirm:hover {
+            background: #16a34a;
+        }
+        .notification-item .action-buttons .btn-replace {
+            background: #f59e0b;
+            color: white;
+        }
+        .notification-item .action-buttons .btn-replace:hover {
+            background: #d97706;
+        }
+
+        .notification-count {
+            background: #ef4444;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            position: absolute;
+            top: -4px;
+            right: -4px;
+        }
+
+        .admin-badge {
+            background: #8b5cf6;
+            color: white;
+            font-size: 10px;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .admin-user-card {
+            transition: all 0.3s;
+        }
+        .admin-user-card:hover {
+            background: #f8fafc;
+        }
+        .admin-user-card .role-toggle {
+            transition: all 0.3s;
+        }
+        .admin-user-card .role-toggle:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <!-- AUTH CONTAINER -->
+    <div id="auth-container" class="auth-container">
+        <div class="auth-card">
+            <div class="auth-logo">MA</div>
+            <h2 id="auth-title" class="text-2xl font-bold text-center text-slate-800 mb-2">Bem-vindo</h2>
+            <p id="auth-subtitle" class="text-center text-slate-500 text-sm mb-6">Escalas Mídia ADENF</p>
+            
+            <form id="auth-form" onsubmit="handleAuth(event)" class="space-y-4">
+                <div id="register-fields" class="hidden space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1.5">Nome Completo</label>
+                        <input type="text" id="reg-nome" class="auth-input" placeholder="Seu nome completo" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1.5">Celular</label>
+                        <input type="tel" id="reg-celular" class="auth-input" placeholder="(88) 99999-9999" required>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1.5">E-mail</label>
+                    <input type="email" id="auth-email" class="auth-input" placeholder="seu@email.com" required>
+                </div>
+
+                <div class="relative">
+                    <label class="block text-sm font-medium text-slate-700 mb-1.5">Senha</label>
+                    <input type="password" id="auth-password" class="auth-input pr-12" placeholder="••••••••" required minlength="6">
+                    <span class="password-toggle" onclick="togglePassword()">
+                        <i class="fa-regular fa-eye"></i>
+                    </span>
+                </div>
+
+                <div id="admin-password-field" class="hidden">
+                    <label class="block text-sm font-medium text-slate-700 mb-1.5">Senha de Administrador</label>
+                    <input type="password" id="admin-password" class="auth-input" placeholder="Digite a senha de admin">
+                </div>
+
+                <button type="submit" id="auth-submit-btn" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3.5 rounded-2xl transition-all btn-touch text-base">
+                    Entrar
+                </button>
+            </form>
+
+            <div class="mt-6 text-center">
+                <span id="auth-toggle-text" class="text-sm text-slate-500">Não tem uma conta?</span>
+                <button onclick="toggleAuthMode()" id="auth-toggle-btn" class="text-orange-500 font-semibold text-sm hover:text-orange-600 transition-colors ml-1">
+                    Criar conta
+                </button>
+            </div>
+
+            <div id="auth-error" class="hidden mt-4 p-3 bg-red-50 border border-red-200 rounded-2xl text-red-600 text-sm text-center"></div>
+        </div>
+    </div>
+
+    <!-- MAIN APP -->
+    <div id="app-container" class="hidden flex h-screen overflow-hidden">
+        <!-- SIDEBAR OVERLAY -->
+        <div id="sidebar-overlay" class="sidebar-overlay fixed inset-0 bg-black/50 z-40 lg:hidden" onclick="closeSidebar()"></div>
+
+        <!-- SIDEBAR -->
+        <div id="sidebar" class="sidebar-mobile lg:sidebar-mobile lg:translate-x-0 fixed lg:relative w-72 lg:w-64 h-full bg-white border-r border-slate-200 flex flex-col z-50 shadow-2xl lg:shadow-none">
+            <div class="p-5 border-b border-slate-200 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 bg-orange-500 rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-lg shadow-orange-500/30">MA</div>
+                    <div>
+                        <div class="font-extrabold text-2xl tracking-tight text-slate-900 leading-none">Mídia</div>
+                        <div class="text-xs text-orange-600 font-semibold -mt-0.5">ADENF</div>
+                    </div>
+                </div>
+                <button onclick="closeSidebar()" class="lg:hidden text-slate-400 hover:text-slate-600 text-2xl p-2">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <div class="flex-1 overflow-auto py-4 px-3" id="sidebar-menu"></div>
+            
+            <div class="p-4 border-t border-slate-200 safe-area-bottom">
+                <div id="user-profile" class="flex items-center gap-3 px-4 py-3 bg-slate-100 rounded-2xl">
+                    <div class="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-xl font-bold">
+                        <span id="user-avatar">👤</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="font-semibold text-sm truncate" id="user-name-display">Usuário</div>
+                        <div class="text-xs text-slate-500 truncate" id="user-email-display">email@email.com</div>
+                    </div>
+                    <button onclick="logout()" class="text-slate-400 hover:text-red-500 transition-colors p-1" title="Sair">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="flex-1 flex flex-col min-w-0">
+            <!-- TOP NAV -->
+            <nav class="h-14 border-b bg-white/95 backdrop-blur-sm px-4 md:px-6 flex items-center justify-between sticky top-0 z-30 safe-area-top">
+                <div class="flex items-center gap-3 min-w-0">
+                    <button onclick="toggleSidebar()" class="lg:hidden text-slate-500 hover:text-orange-500 p-2 -ml-2 transition-colors">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                    <div class="text-base md:text-lg font-semibold text-slate-700 truncate" id="page-title">Início</div>
+                </div>
+                
+                <div class="flex items-center gap-2 md:gap-4">
+                    <div class="hidden sm:block relative">
+                        <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                        <input id="search-input" onkeyup="if(event.key==='Enter') handleSearch()" type="text" placeholder="Buscar..." class="w-48 md:w-64 lg:w-80 bg-slate-100 border border-slate-200 focus:border-orange-300 rounded-3xl pl-9 pr-4 py-2 text-sm focus:outline-none transition-colors">
+                    </div>
+                    
+                    <button onclick="toggleMobileSearch()" class="sm:hidden text-slate-500 hover:text-orange-500 p-2 transition-colors">
+                        <i class="fa-solid fa-search text-lg"></i>
+                    </button>
+                    
+                    <div onclick="openNotifications()" class="relative cursor-pointer p-2 hover:text-orange-500 transition-colors">
+                        <i class="fa-solid fa-bell text-xl text-slate-500 hover:text-orange-500 transition-colors"></i>
+                        <div id="notification-count" class="notification-count hidden">0</div>
+                    </div>
+                    
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 bg-orange-100 text-orange-600 rounded-2xl flex items-center justify-center text-sm font-bold shadow-sm">
+                            <span id="nav-avatar">JP</span>
+                        </div>
+                        <div class="hidden md:block">
+                            <div class="text-sm font-medium" id="nav-name">Usuário</div>
+                            <div class="text-xs text-slate-500 -mt-0.5" id="nav-role">Voluntário</div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <div id="mobile-search" class="hidden sm:hidden px-4 py-3 bg-white border-b">
+                <div class="relative">
+                    <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input id="search-input-mobile" onkeyup="if(event.key==='Enter') { handleSearch(); toggleMobileSearch(); }" type="text" placeholder="Buscar..." class="w-full bg-slate-100 border border-slate-200 focus:border-orange-300 rounded-3xl pl-9 pr-4 py-2.5 text-sm focus:outline-none">
+                </div>
+            </div>
+
+            <div class="flex-1 overflow-auto p-4 md:p-6" id="main-content"></div>
+        </div>
+    </div>
+
+    <!-- NOTIFICATIONS MODAL -->
+    <div id="notifications-modal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-3xl w-full max-w-lg mx-auto modal shadow-2xl max-h-[90vh] overflow-hidden">
+            <div class="p-4 md:p-6 border-b flex justify-between items-center">
+                <div>
+                    <h3 class="font-semibold text-lg">🔔 Notificações</h3>
+                    <p class="text-sm text-slate-500" id="notif-subtitle">Suas escalas</p>
+                </div>
+                <button onclick="closeNotifications()" class="text-slate-400 hover:text-slate-600 text-2xl p-2 -m-2">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div id="notifications-list" class="p-4 overflow-auto max-h-[calc(90vh-140px)]">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ADMIN USERS MODAL -->
+    <div id="admin-users-modal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-3xl w-full max-w-2xl mx-auto modal shadow-2xl max-h-[90vh] overflow-hidden">
+            <div class="p-4 md:p-6 border-b flex justify-between items-center">
+                <div>
+                    <h3 class="font-semibold text-lg">👥 Gerenciar Administradores</h3>
+                    <p class="text-sm text-slate-500">Gerencie quem tem acesso administrativo</p>
+                </div>
+                <button onclick="closeAdminUsersModal()" class="text-slate-400 hover:text-slate-600 text-2xl p-2 -m-2">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div id="admin-users-list" class="p-4 overflow-auto max-h-[calc(90vh-140px)]">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast" class="hidden fixed bottom-6 left-4 right-4 sm:left-auto sm:right-6 sm:max-w-md bg-slate-800 text-white px-6 py-4 rounded-2xl flex items-center gap-3 shadow-2xl z-50">
+        <i id="toast-icon" class="fa-solid fa-check-circle text-emerald-400 text-xl flex-shrink-0"></i>
+        <span id="toast-message" class="font-medium text-sm flex-1"></span>
+    </div>
+
+    <script>
+        // ============================================
+        // CONFIGURAÇÃO
+        // ============================================
+        const CONFIG = {
+            APP_NAME: 'Escalas Mídia Adenf',
+            STORAGE_KEY: 'midia_adenf_data',
+            ADMIN_PASSWORD: 'Admin1975',
+            MASTER_ADMIN_EMAIL: 'isaque_severo@icloud.com',
+            VERSION: '1.0.0'
+        };
+
+        // ============================================
+        // ESTADO DA APLICAÇÃO
+        // ============================================
+        let state = {
+            currentUser: null,
+            isAdmin: false,
+            currentPage: 'dashboard',
+            sidebarOpen: false,
+            mobileSearchOpen: false,
+            editingCultoId: null,
+            positionToAssign: null,
+            isLoginMode: true
+        };
+
+        // ============================================
+        // DADOS
+        // ============================================
+        let membros = [];
+        let cultos = [];
+        let notifications = [];
+        let usuarios = [];
+
+        // Dados iniciais
+        const membrosPadrao = [
+            { id: 1, nome: "Isaque Severo", foto: "https://i.pravatar.cc/150?u=isaque", funcao: "Coordenação", telefone: "(88) 99999-1234", email: "isaque_severo@icloud.com" },
+            { id: 2, nome: "Ana Clara", foto: "https://i.pravatar.cc/150?u=ana", funcao: "Projeção", telefone: "(88) 99999-5678", email: "ana@email.com" },
+            { id: 3, nome: "Lucas Mendes", foto: "https://i.pravatar.cc/150?u=lucas", funcao: "Som", telefone: "(88) 99999-4321", email: "lucas@email.com" },
+            { id: 4, nome: "Beatriz Lima", foto: "https://i.pravatar.cc/150?u=beatriz", funcao: "Livestream", telefone: "(88) 99999-8765", email: "beatriz@email.com" },
+            { id: 5, nome: "Rafael Costa", foto: "https://i.pravatar.cc/150?u=rafael", funcao: "Fotografia", telefone: "(88) 99999-1122", email: "rafael@email.com" },
+            { id: 6, nome: "Mariana Silva", foto: "https://i.pravatar.cc/150?u=mariana", funcao: "Iluminação", telefone: "(88) 99999-3344", email: "mariana@email.com" }
+        ];
+
+        const cultosPadrao = [
+            {
+                id: 1,
+                data: new Date(Date.now() + 86400000 * 2).toISOString().split('T')[0],
+                horario: "09:00",
+                tipo: "Culto de Domingo - Manhã",
+                status: "publicada",
+                escalas: {
+                    "Coordenação de Mídia": 1,
+                    "Som Principal": 3,
+                    "Projeção": 2,
+                    "Livestream": 4,
+                    "Fotografia": null,
+                    "Iluminação": 6
+                }
+            },
+            {
+                id: 2,
+                data: new Date(Date.now() + 86400000 * 2).toISOString().split('T')[0],
+                horario: "18:30",
+                tipo: "Culto de Domingo - Noite",
+                status: "publicada",
+                escalas: {
+                    "Coordenação de Mídia": 1,
+                    "Som Principal": null,
+                    "Projeção": 2,
+                    "Livestream": null,
+                    "Fotografia": 5,
+                    "Iluminação": null
+                }
+            }
+        ];
+
+        // ============================================
+        // PERSISTÊNCIA
+        // ============================================
+        function saveData() {
+            try {
+                const data = { membros, cultos, notifications, usuarios };
+                localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(data));
+            } catch (e) {
+                console.warn('Erro ao salvar dados:', e);
+            }
+        }
+
+        function loadData() {
+            try {
+                const saved = localStorage.getItem(CONFIG.STORAGE_KEY);
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    membros = data.membros || [];
+                    cultos = data.cultos || [];
+                    notifications = data.notifications || [];
+                    usuarios = data.usuarios || [];
+                    return true;
+                }
+            } catch (e) {
+                console.warn('Erro ao carregar dados:', e);
+            }
+            return false;
+        }
+
+        function initDefaultData() {
+            // Cria admin master (Isaque Severo)
+            const masterAdmin = {
+                id: 1,
+                nome: "Isaque Severo",
+                email: CONFIG.MASTER_ADMIN_EMAIL,
+                celular: "(88) 99999-1234",
+                senha: "Admin1975",
+                isAdmin: true,
+                isMaster: true
+            };
+
+            // Verifica se já existe
+            const exists = usuarios.find(u => u.email === CONFIG.MASTER_ADMIN_EMAIL);
+            if (!exists) {
+                usuarios = [masterAdmin];
+                // Adiciona membros
+                membros = [...membrosPadrao];
+                // Adiciona cultos
+                cultos = [...cultosPadrao];
+                saveData();
+            }
+        }
+
+        // ============================================
+        // AUTH
+        // ============================================
+        function togglePassword() {
+            const input = document.getElementById('auth-password');
+            const icon = document.querySelector('.password-toggle i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fa-regular fa-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'fa-regular fa-eye';
+            }
+        }
+
+        function toggleAuthMode() {
+            state.isLoginMode = !state.isLoginMode;
+            const title = document.getElementById('auth-title');
+            const subtitle = document.getElementById('auth-subtitle');
+            const submitBtn = document.getElementById('auth-submit-btn');
+            const toggleText = document.getElementById('auth-toggle-text');
+            const toggleBtn = document.getElementById('auth-toggle-btn');
+            const registerFields = document.getElementById('register-fields');
+            const adminField = document.getElementById('admin-password-field');
+            const errorDiv = document.getElementById('auth-error');
+            
+            errorDiv.classList.add('hidden');
+            
+            if (state.isLoginMode) {
+                title.textContent = 'Bem-vindo de volta';
+                subtitle.textContent = 'Faça login para continuar';
+                submitBtn.textContent = 'Entrar';
+                toggleText.textContent = 'Não tem uma conta?';
+                toggleBtn.textContent = 'Criar conta';
+                registerFields.classList.add('hidden');
+                adminField.classList.add('hidden');
+            } else {
+                title.textContent = 'Criar Conta';
+                subtitle.textContent = 'Cadastre-se para começar';
+                submitBtn.textContent = 'Cadastrar';
+                toggleText.textContent = 'Já tem uma conta?';
+                toggleBtn.textContent = 'Fazer login';
+                registerFields.classList.remove('hidden');
+                adminField.classList.add('hidden');
+            }
+        }
+
+        function handleAuth(e) {
+            e.preventDefault();
+            const errorDiv = document.getElementById('auth-error');
+            errorDiv.classList.add('hidden');
+            
+            const email = document.getElementById('auth-email').value.trim();
+            const senha = document.getElementById('auth-password').value;
+            
+            if (!email || !senha) {
+                showAuthError('Preencha todos os campos.');
+                return;
+            }
+
+            if (state.isLoginMode) {
+                // LOGIN
+                const user = usuarios.find(u => u.email === email);
+                if (!user) {
+                    showAuthError('Usuário não encontrado. Verifique seu e-mail.');
+                    return;
+                }
+                
+                if (user.senha !== senha) {
+                    showAuthError('Senha incorreta. Tente novamente.');
+                    return;
+                }
+                
+                // Se for admin, verifica senha admin
+                if (user.isAdmin) {
+                    const adminPassword = document.getElementById('admin-password').value;
+                    if (adminPassword !== CONFIG.ADMIN_PASSWORD) {
+                        showAuthError('Senha de administrador incorreta.');
+                        return;
+                    }
+                }
+                
+                // Login bem-sucedido
+                state.currentUser = user;
+                state.isAdmin = user.isAdmin || false;
+                loginSuccess();
+                
+            } else {
+                // REGISTRO
+                const nome = document.getElementById('reg-nome').value.trim();
+                const celular = document.getElementById('reg-celular').value.trim();
+                
+                if (!nome || !celular) {
+                    showAuthError('Preencha todos os campos de cadastro.');
+                    return;
+                }
+                
+                if (usuarios.find(u => u.email === email)) {
+                    showAuthError('Este e-mail já está cadastrado.');
+                    return;
+                }
+                
+                if (senha.length < 6) {
+                    showAuthError('A senha deve ter pelo menos 6 caracteres.');
+                    return;
+                }
+                
+                // Cria novo usuário (sempre voluntário inicialmente)
+                const newUser = {
+                    id: Date.now(),
+                    nome,
+                    email,
+                    celular,
+                    senha,
+                    isAdmin: false,
+                    isMaster: false
+                };
+                usuarios.push(newUser);
+                
+                // Adiciona como membro
+                membros.push({
+                    id: newUser.id,
+                    nome: newUser.nome,
+                    foto: `https://i.pravatar.cc/150?u=${newUser.id}`,
+                    funcao: "Voluntário",
+                    telefone: newUser.celular,
+                    email: newUser.email
+                });
+                
+                saveData();
+                
+                showToast('✅ Conta criada com sucesso! Faça login.', 'fa-check-circle');
+                toggleAuthMode();
+                document.getElementById('auth-email').value = email;
+                document.getElementById('auth-password').value = '';
+            }
+        }
+
+        function showAuthError(message) {
+            const errorDiv = document.getElementById('auth-error');
+            errorDiv.textContent = message;
+            errorDiv.classList.remove('hidden');
+            document.querySelectorAll('.auth-input').forEach(el => {
+                el.classList.add('error');
+                setTimeout(() => el.classList.remove('error'), 3000);
+            });
+        }
+
+        function loginSuccess() {
+            document.getElementById('auth-container').classList.add('hidden');
+            document.getElementById('app-container').classList.remove('hidden');
+            
+            // Atualiza UI
+            const user = state.currentUser;
+            document.getElementById('user-name-display').textContent = user.nome;
+            document.getElementById('user-email-display').textContent = user.email;
+            document.getElementById('nav-name').textContent = user.nome;
+            document.getElementById('nav-avatar').textContent = user.nome.substring(0, 2).toUpperCase();
+            document.getElementById('user-avatar').textContent = user.nome.substring(0, 2).toUpperCase();
+            
+            if (state.isAdmin) {
+                document.getElementById('nav-role').innerHTML = 'Administrador <span class="admin-badge">ADMIN</span>';
+            } else {
+                document.getElementById('nav-role').textContent = 'Voluntário';
+            }
+            
+            // Inicializa app
+            initializeApp();
+            
+            showToast(`👋 Bem-vindo, ${user.nome}!`, 'fa-hand-wave');
+        }
+
+        function logout() {
+            if (confirm('Tem certeza que deseja sair?')) {
+                state.currentUser = null;
+                state.isAdmin = false;
+                document.getElementById('auth-container').classList.remove('hidden');
+                document.getElementById('app-container').classList.add('hidden');
+                document.getElementById('auth-password').value = '';
+                document.getElementById('admin-password').value = '';
+                showToast('👋 Até logo!', 'fa-wave');
+            }
+        }
+
+        // ============================================
+        // GERENCIAMENTO DE ADMINISTRADORES
+        // ============================================
+        function openAdminUsersModal() {
+            const modal = document.getElementById('admin-users-modal');
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            renderAdminUsersList();
+        }
+
+        function closeAdminUsersModal() {
+            document.getElementById('admin-users-modal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        function renderAdminUsersList() {
+            const container = document.getElementById('admin-users-list');
+            
+            // Usuários que podem ser gerenciados (todos exceto o master admin)
+            const manageUsers = usuarios.filter(u => !u.isMaster);
+            
+            if (manageUsers.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 text-slate-400">
+                        <i class="fa-solid fa-users-slash text-4xl mb-3 block"></i>
+                        <p>Nenhum usuário para gerenciar</p>
+                        <p class="text-sm">Os usuários aparecerão aqui quando se cadastrarem</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = `
+                <div class="space-y-3">
+                    ${manageUsers.map(user => {
+                        const isAdmin = user.isAdmin || false;
+                        const member = membros.find(m => m.id === user.id);
+                        
+                        return `
+                            <div class="admin-user-card bg-slate-50 rounded-2xl p-4 flex items-center justify-between">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <div class="w-10 h-10 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center font-bold text-sm flex-shrink-0">
+                                        ${user.nome.substring(0, 2).toUpperCase()}
+                                    </div>
+                                    <div class="min-w-0">
+                                        <div class="font-semibold text-sm truncate">${user.nome}</div>
+                                        <div class="text-xs text-slate-500 truncate">${user.email}</div>
+                                        ${member ? `<div class="text-xs text-slate-400 mt-0.5">${member.funcao}</div>` : ''}
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2 flex-shrink-0">
+                                    <span class="text-xs text-slate-500 mr-1">
+                                        ${isAdmin ? '👑 Admin' : '👤 Voluntário'}
+                                    </span>
+                                    <button onclick="toggleUserAdmin(${user.id})" 
+                                            class="role-toggle px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors ${isAdmin ? 'bg-red-100 text-red-700 hover:bg-red-200' : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'}">
+                                        ${isAdmin ? 'Remover Admin' : 'Tornar Admin'}
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+                <div class="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-2xl text-sm text-amber-700">
+                    <i class="fa-solid fa-info-circle mr-2"></i>
+                    O administrador master (${CONFIG.MASTER_ADMIN_EMAIL}) não pode ser removido.
+                </div>
+            `;
+        }
+
+        function toggleUserAdmin(userId) {
+            const user = usuarios.find(u => u.id === userId);
+            if (!user) return;
+            
+            // Não permite alterar o master admin
+            if (user.isMaster) {
+                showToast('⚠️ Não é possível alterar o administrador master.', 'fa-exclamation-triangle');
+                return;
+            }
+            
+            // Não permite remover o último admin (exceto master)
+            const adminCount = usuarios.filter(u => u.isAdmin).length;
+            if (user.isAdmin && adminCount <= 1) {
+                showToast('⚠️ Deve haver pelo menos um administrador (além do master).', 'fa-exclamation-triangle');
+                return;
+            }
+            
+            user.isAdmin = !user.isAdmin;
+            saveData();
+            
+            // Atualiza o membro correspondente
+            const member = membros.find(m => m.id === userId);
+            if (member) {
+                member.funcao = user.isAdmin ? 'Administrador' : 'Voluntário';
+            }
+            
+            showToast(
+                user.isAdmin ? 
+                `✅ ${user.nome} agora é Administrador!` : 
+                `📋 ${user.nome} agora é Voluntário.`,
+                user.isAdmin ? 'fa-crown' : 'fa-user'
+            );
+            
+            renderAdminUsersList();
+            
+            // Se o usuário atual foi alterado, atualiza UI
+            if (state.currentUser.id === userId) {
+                state.isAdmin = user.isAdmin;
+                if (state.isAdmin) {
+                    document.getElementById('nav-role').innerHTML = 'Administrador <span class="admin-badge">ADMIN</span>';
+                } else {
+                    document.getElementById('nav-role').textContent = 'Voluntário';
+                }
+                renderSidebar();
+                navigateTo(state.currentPage);
+            }
+        }
+
+        // ============================================
+        // NOTIFICAÇÕES
+        // ============================================
+        function createNotification(cultoId, userId, position) {
+            const culto = cultos.find(c => c.id === cultoId);
+            if (!culto) return;
+            
+            const user = usuarios.find(u => u.id === userId);
+            if (!user) return;
+            
+            const exists = notifications.find(n => n.cultoId === cultoId && n.userId === userId);
+            if (exists) return;
+            
+            notifications.push({
+                id: Date.now(),
+                cultoId: cultoId,
+                userId: userId,
+                position: position,
+                cultoTipo: culto.tipo,
+                cultoData: culto.data,
+                cultoHorario: culto.horario,
+                status: 'pending',
+                createdAt: new Date().toISOString(),
+                read: false
+            });
+            
+            saveData();
+            updateNotificationBadge();
+        }
+
+        function sendScaleNotifications(cultoId) {
+            const culto = cultos.find(c => c.id === cultoId);
+            if (!culto || culto.status !== 'publicada') return;
+            
+            let sentCount = 0;
+            Object.entries(culto.escalas).forEach(([position, userId]) => {
+                if (userId) {
+                    createNotification(cultoId, userId, position);
+                    sentCount++;
+                }
+            });
+            
+            showToast(`📨 ${sentCount} notificação(ões) enviada(s)!`, 'fa-bell');
+        }
+
+        function updateNotificationBadge() {
+            if (!state.currentUser) return;
+            const pending = notifications.filter(n => n.status === 'pending' && n.userId === state.currentUser.id);
+            const badge = document.getElementById('notification-count');
+            if (pending.length > 0) {
+                badge.textContent = pending.length;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        function openNotifications() {
+            const modal = document.getElementById('notifications-modal');
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            
+            const container = document.getElementById('notifications-list');
+            const userNotifs = notifications.filter(n => n.userId === state.currentUser.id);
+            
+            if (userNotifs.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 text-slate-400">
+                        <i class="fa-solid fa-bell-slash text-4xl mb-3 block"></i>
+                        <p>Nenhuma notificação</p>
+                        <p class="text-sm">Você será notificado quando for escalado</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            userNotifs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            
+            container.innerHTML = userNotifs.map(notif => {
+                const dataFormatada = new Date(notif.cultoData).toLocaleDateString('pt-BR', { 
+                    weekday: 'long', 
+                    day: 'numeric', 
+                    month: 'long' 
+                });
+                
+                let statusHTML = '';
+                let actionsHTML = '';
+                
+                if (notif.status === 'pending') {
+                    actionsHTML = `
+                        <div class="action-buttons">
+                            <button onclick="confirmNotification(${notif.id})" class="btn-confirm">
+                                <i class="fa-solid fa-check mr-1"></i> Confirmar
+                            </button>
+                            <button onclick="replaceNotification(${notif.id})" class="btn-replace">
+                                <i class="fa-solid fa-rotate mr-1"></i> Substituir
+                            </button>
+                        </div>
+                    `;
+                    statusHTML = `<span class="status-badge bg-amber-100 text-amber-700">⏳ Pendente</span>`;
+                } else if (notif.status === 'confirmed') {
+                    statusHTML = `<span class="status-badge bg-emerald-100 text-emerald-700">✅ Confirmada</span>`;
+                } else if (notif.status === 'replaced') {
+                    statusHTML = `<span class="status-badge bg-orange-100 text-orange-700">🔄 Substituída</span>`;
+                }
+                
+                return `
+                    <div class="notification-item ${notif.status !== 'pending' ? notif.status : ''}">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="font-semibold">${notif.cultoTipo}</div>
+                                <div class="text-sm text-slate-500">${dataFormatada} • ${notif.cultoHorario}</div>
+                                <div class="text-sm mt-1">
+                                    <span class="text-slate-500">Sua função:</span>
+                                    <span class="font-medium">${notif.position}</span>
+                                </div>
+                            </div>
+                            ${statusHTML}
+                        </div>
+                        ${actionsHTML}
+                    </div>
+                `;
+            }).join('');
+            
+            userNotifs.forEach(n => n.read = true);
+            saveData();
+            updateNotificationBadge();
+        }
+
+        function closeNotifications() {
+            document.getElementById('notifications-modal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        function confirmNotification(notifId) {
+            const notif = notifications.find(n => n.id === notifId);
+            if (notif) {
+                notif.status = 'confirmed';
+                saveData();
+                showToast('✅ Presença confirmada! Obrigado por servir.', 'fa-check-circle');
+                openNotifications();
+                updateNotificationBadge();
+            }
+        }
+
+        function replaceNotification(notifId) {
+            const notif = notifications.find(n => n.id === notifId);
+            if (notif) {
+                notif.status = 'replaced';
+                saveData();
+                showToast('🔄 Solicitação de substituição enviada. Aguarde contato.', 'fa-rotate');
+                openNotifications();
+                updateNotificationBadge();
+            }
+        }
+
+        // ============================================
+        // NAVEGAÇÃO
+        // ============================================
+        const navItems = [
+            { icon: "fa-house", label: "Início", id: "dashboard" },
+            { icon: "fa-calendar-check", label: "Minhas Escalas", id: "my-scales" },
+            { icon: "fa-list", label: "Todas as Escalas", id: "all-scales" },
+            { icon: "fa-users", label: "Equipe", id: "team" }
+        ];
+
+        function getNavItems() {
+            const items = [...navItems];
+            if (state.isAdmin) {
+                items.push({ icon: "fa-gear", label: "Admin", id: "admin" });
+            }
+            return items;
+        }
+
+        function renderSidebar() {
+            const container = document.getElementById("sidebar-menu");
+            const items = getNavItems();
+            
+            container.innerHTML = `
+                <nav class="space-y-1 px-2">
+                    ${items.map(item => `
+                        <div onclick="navigateTo('${item.id}')" 
+                             class="flex items-center gap-3 px-4 py-3.5 rounded-2xl cursor-pointer text-slate-600 hover:text-orange-600 transition-all group ${state.currentPage === item.id ? 'bg-orange-50 text-orange-600 font-semibold' : ''}"
+                             data-page="${item.id}">
+                            <i class="fa-solid ${item.icon} w-5 text-lg group-hover:scale-110 transition-transform"></i>
+                            <span class="font-medium">${item.label}</span>
+                            ${state.currentPage === item.id ? '<span class="ml-auto w-1.5 h-8 bg-orange-500 rounded-full"></span>' : ''}
+                        </div>
+                    `).join('')}
+                </nav>
+            `;
+        }
+
+        function navigateTo(page) {
+            state.currentPage = page;
+            const pageTitle = getNavItems().find(n => n.id === page)?.label || page;
+            document.getElementById("page-title").textContent = pageTitle;
+            
+            closeSidebar();
+            renderSidebar();
+            
+            const content = document.getElementById("main-content");
+            
+            switch(page) {
+                case "dashboard": renderDashboard(); break;
+                case "all-scales": renderAllScales(); break;
+                case "my-scales": renderMyScales(); break;
+                case "team": renderTeam(); break;
+                case "admin": renderAdminPanel(); break;
+                default: renderDashboard();
+            }
+        }
+
+        // ============================================
+        // PÁGINAS (versão simplificada)
+        // ============================================
+        function renderDashboard() {
+            const container = document.getElementById("main-content");
+            const totalCultos = cultos.length;
+            const totalMembros = membros.length;
+            const cultosPublicados = cultos.filter(c => c.status === 'publicada').length;
+            const vagas = cultos.reduce((acc, c) => {
+                return acc + Object.values(c.escalas).filter(v => v === null).length;
+            }, 0);
+            
+            container.innerHTML = `
+                <div class="max-w-7xl mx-auto">
+                    <div class="mb-6 md:mb-8">
+                        <h1 class="text-2xl md:text-4xl font-bold text-slate-900">Bem-vindo, ${state.currentUser.nome}! 👋</h1>
+                        <p class="text-slate-500 text-sm md:text-base">Aqui está o resumo das escalas.</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-10">
+                        <div class="bg-white rounded-2xl md:rounded-3xl p-4 md:p-6 card-hover border border-slate-100">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <div class="text-2xl md:text-4xl font-bold text-orange-500">${totalCultos}</div>
+                                    <div class="text-xs md:text-sm text-slate-500 font-medium">Cultos</div>
+                                </div>
+                                <i class="fa-solid fa-calendar text-2xl md:text-4xl text-orange-200"></i>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-2xl md:rounded-3xl p-4 md:p-6 card-hover border border-slate-100">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <div class="text-2xl md:text-4xl font-bold text-emerald-500">${cultosPublicados}</div>
+                                    <div class="text-xs md:text-sm text-slate-500 font-medium">Publicados</div>
+                                </div>
+                                <i class="fa-solid fa-check-circle text-2xl md:text-4xl text-emerald-200"></i>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-2xl md:rounded-3xl p-4 md:p-6 card-hover border border-slate-100">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <div class="text-2xl md:text-4xl font-bold text-amber-500">${vagas}</div>
+                                    <div class="text-xs md:text-sm text-slate-500 font-medium">Vagas</div>
+                                </div>
+                                <i class="fa-solid fa-user-plus text-2xl md:text-4xl text-amber-200"></i>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-2xl md:rounded-3xl p-4 md:p-6 card-hover border border-slate-100">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <div class="text-2xl md:text-4xl font-bold text-purple-500">${totalMembros}</div>
+                                    <div class="text-xs md:text-sm text-slate-500 font-medium">Membros</div>
+                                </div>
+                                <i class="fa-solid fa-users text-2xl md:text-4xl text-purple-200"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg md:text-xl font-semibold">Próximos Cultos</h2>
+                        <button onclick="navigateTo('all-scales')" class="text-sm text-orange-500 hover:text-orange-600 font-medium">
+                            Ver todos <i class="fa-solid fa-arrow-right ml-1"></i>
+                        </button>
+                    </div>
+                    <div id="upcoming-list" class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6"></div>
+                </div>
+            `;
+            renderUpcoming();
+        }
+
+        function renderUpcoming() {
+            const container = document.getElementById("upcoming-list");
+            if (!container) return;
+            
+            const upcoming = cultos.filter(c => c.status === 'publicada').slice(0, 4);
+            if (upcoming.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-12 text-slate-400">
+                        <i class="fa-solid fa-calendar-plus text-4xl mb-3 block"></i>
+                        <p>Nenhum culto programado.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = upcoming.map(culto => {
+                const assignedCount = Object.values(culto.escalas).filter(v => v !== null).length;
+                const totalPositions = Object.keys(culto.escalas).length;
+                const filled = Math.round((assignedCount / totalPositions) * 100);
+                
+                return `
+                    <div class="bg-white rounded-2xl md:rounded-3xl p-4 md:p-6 card-hover border border-slate-100">
+                        <div class="flex justify-between items-start gap-2">
+                            <div class="min-w-0">
+                                <div class="font-semibold text-sm md:text-base truncate">${culto.tipo}</div>
+                                <div class="text-xs md:text-sm text-slate-500">
+                                    ${new Date(culto.data).toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric', month: 'short' })} • ${culto.horario}
+                                </div>
+                            </div>
+                            <span class="status-badge flex-shrink-0 bg-emerald-100 text-emerald-700">✅ Publicada</span>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <div class="flex justify-between text-xs text-slate-500 mb-1">
+                                <span>Preenchimento</span>
+                                <span>${filled}%</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                <div class="h-full bg-orange-500 rounded-full transition-all duration-500" style="width: ${filled}%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 grid grid-cols-2 gap-2 text-xs md:text-sm">
+                            ${Object.entries(culto.escalas).slice(0, 4).map(([pos, id]) => `
+                                <div class="flex items-center gap-1.5 min-w-0">
+                                    <span class="text-orange-500 text-xs flex-shrink-0">•</span>
+                                    <span class="text-slate-500 truncate">${pos}:</span>
+                                    <span class="font-medium truncate ${id ? 'text-slate-700' : 'text-red-400'}">
+                                        ${id ? getMemberName(id) : 'Vago'}
+                                    </span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderAllScales() {
+            const container = document.getElementById("main-content");
+            
+            container.innerHTML = `
+                <div class="max-w-7xl mx-auto">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                        <h2 class="text-xl md:text-2xl font-semibold">Todas as Escalas</h2>
+                        <div class="flex gap-2 w-full sm:w-auto">
+                            <select id="filter-status" onchange="filterScales()" 
+                                    class="flex-1 sm:flex-none border border-slate-200 rounded-2xl px-4 py-2 text-sm focus:outline-none focus:border-orange-400 bg-white">
+                                <option value="all">Todos</option>
+                                <option value="publicada">Publicados</option>
+                                <option value="rascunho">Rascunhos</option>
+                            </select>
+                            ${state.isAdmin ? `
+                            <button onclick="addNewCulto()" 
+                                    class="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-2xl text-sm font-medium btn-touch whitespace-nowrap">
+                                <i class="fa-solid fa-plus"></i>
+                                <span class="hidden sm:inline">Novo</span>
+                            </button>` : ''}
+                        </div>
+                    </div>
+                    <div id="scales-list" class="space-y-4 md:space-y-6"></div>
+                </div>
+            `;
+            renderScalesList('all');
+        }
+
+        function renderScalesList(filter) {
+            const container = document.getElementById("scales-list");
+            if (!container) return;
+            
+            let filtered = cultos;
+            if (filter !== 'all') {
+                filtered = cultos.filter(c => c.status === filter);
+            }
+            
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 text-slate-400">
+                        <i class="fa-solid fa-inbox text-4xl mb-3 block"></i>
+                        <p>Nenhum culto encontrado.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = filtered.map(culto => {
+                const assignedCount = Object.values(culto.escalas).filter(v => v !== null).length;
+                const totalPositions = Object.keys(culto.escalas).length;
+                
+                return `
+                    <div class="bg-white rounded-2xl md:rounded-3xl p-4 md:p-8 card-hover border border-slate-100">
+                        <div class="flex flex-col sm:flex-row justify-between gap-3">
+                            <div>
+                                <div class="font-semibold text-base md:text-xl">${culto.tipo}</div>
+                                <div class="text-sm md:text-base text-slate-500">
+                                    ${new Date(culto.data).toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })} • ${culto.horario}
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span class="status-badge ${culto.status === 'publicada' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">
+                                    ${culto.status === 'publicada' ? '✅ Publicada' : '✏️ Rascunho'}
+                                </span>
+                                <span class="text-xs text-slate-400">${assignedCount}/${totalPositions}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+                            ${Object.entries(culto.escalas).map(([pos, id]) => {
+                                const member = id ? getMemberById(id) : null;
+                                return `
+                                    <div class="bg-slate-50 p-3 md:p-4 rounded-2xl">
+                                        <div class="text-xs text-slate-500 mb-1 truncate">${pos}</div>
+                                        <div class="flex items-center gap-2">
+                                            ${member ? `
+                                            <img src="${member.foto}" class="w-8 h-8 md:w-9 md:h-9 rounded-2xl object-cover ring-2 ring-orange-100 flex-shrink-0">
+                                            <div class="min-w-0">
+                                                <div class="font-medium text-xs md:text-sm truncate">${member.nome}</div>
+                                            </div>` : `
+                                            <div class="text-red-400 text-xs md:text-sm font-medium flex items-center gap-1.5">
+                                                <i class="fa-solid fa-circle-exclamation text-xs"></i>
+                                                <span class="truncate">Vago</span>
+                                            </div>`}
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                        
+                        ${state.isAdmin ? `
+                        <div class="flex flex-col sm:flex-row gap-3 mt-6">
+                            <button onclick="editCulto(${culto.id})" 
+                                    class="flex-1 py-3 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-2xl btn-touch transition-colors">
+                                <i class="fa-solid fa-pencil mr-2"></i> Editar
+                            </button>
+                            <button onclick="toggleCultoStatus(${culto.id})" 
+                                    class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-2xl btn-touch transition-colors">
+                                ${culto.status === 'publicada' ? '📄 Rascunho' : '✅ Publicar'}
+                            </button>
+                            ${culto.status === 'publicada' ? `
+                            <button onclick="sendScaleNotifications(${culto.id})" 
+                                    class="flex-1 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-2xl btn-touch transition-colors">
+                                <i class="fa-solid fa-bell mr-2"></i> Notificar
+                            </button>` : ''}
+                        </div>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function filterScales() {
+            const filter = document.getElementById('filter-status').value;
+            renderScalesList(filter);
+        }
+
+        function renderMyScales() {
+            const container = document.getElementById("main-content");
+            const userCultos = cultos.filter(culto => {
+                return Object.values(culto.escalas).includes(state.currentUser.id);
+            });
+            
+            container.innerHTML = `
+                <div class="max-w-7xl mx-auto">
+                    <h2 class="text-xl md:text-2xl font-semibold mb-6">Minhas Escalas</h2>
+                    ${userCultos.length > 0 ? `
+                    <div class="space-y-4 md:space-y-6">
+                        ${userCultos.map(culto => {
+                            const userPositions = Object.entries(culto.escalas)
+                                .filter(([pos, id]) => id === state.currentUser.id)
+                                .map(([pos]) => pos);
+                            
+                            const notif = notifications.find(n => 
+                                n.cultoId === culto.id && 
+                                n.userId === state.currentUser.id
+                            );
+                            
+                            let statusText = 'Pendente';
+                            let statusColor = 'bg-amber-100 text-amber-700';
+                            if (notif?.status === 'confirmed') {
+                                statusText = '✅ Confirmada';
+                                statusColor = 'bg-emerald-100 text-emerald-700';
+                            } else if (notif?.status === 'replaced') {
+                                statusText = '🔄 Substituída';
+                                statusColor = 'bg-orange-100 text-orange-700';
+                            }
+                            
+                            return `
+                                <div class="bg-white rounded-2xl md:rounded-3xl p-4 md:p-8 card-hover border border-slate-100">
+                                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                                        <div>
+                                            <div class="font-semibold text-base md:text-xl">${culto.tipo}</div>
+                                            <div class="text-sm text-slate-500">
+                                                ${new Date(culto.data).toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })} • ${culto.horario}
+                                            </div>
+                                            <div class="mt-2 flex flex-wrap gap-1.5">
+                                                ${userPositions.map(pos => `
+                                                    <span class="bg-orange-100 text-orange-700 text-xs px-3 py-1 rounded-full font-medium">${pos}</span>
+                                                `).join('')}
+                                            </div>
+                                        </div>
+                                        <div class="flex flex-col items-end gap-2">
+                                            <span class="status-badge ${statusColor}">${statusText}</span>
+                                            ${notif?.status === 'pending' ? `
+                                            <div class="flex gap-2">
+                                                <button onclick="confirmNotification(${notif.id})" 
+                                                        class="px-4 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-medium btn-touch">
+                                                    <i class="fa-solid fa-check"></i> Confirmar
+                                                </button>
+                                                <button onclick="replaceNotification(${notif.id})" 
+                                                        class="px-4 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-medium btn-touch">
+                                                    <i class="fa-solid fa-rotate"></i> Substituir
+                                                </button>
+                                            </div>` : ''}
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>` : `
+                    <div class="text-center py-16 text-slate-400">
+                        <i class="fa-solid fa-calendar-xmark text-5xl mb-4 block"></i>
+                        <p class="text-lg">Nenhuma escala atribuída.</p>
+                        <p class="text-sm">Você será notificado quando for escalado.</p>
+                    </div>`}
+                </div>
+            `;
+        }
+
+        function renderTeam() {
+            const container = document.getElementById("main-content");
+            
+            container.innerHTML = `
+                <div class="max-w-7xl mx-auto">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl md:text-2xl font-semibold">Equipe de Mídia</h2>
+                        <span class="text-sm text-slate-500">${membros.length} membros</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+                        ${membros.map(member => `
+                            <div class="bg-white rounded-2xl md:rounded-3xl p-4 md:p-6 card-hover border border-slate-100">
+                                <div class="flex items-center gap-3 md:gap-4">
+                                    <img src="${member.foto}" class="w-14 h-14 md:w-16 md:h-16 rounded-2xl md:rounded-3xl object-cover ring-2 ring-orange-100 flex-shrink-0">
+                                    <div class="min-w-0 flex-1">
+                                        <div class="font-semibold text-sm md:text-base truncate">${member.nome}</div>
+                                        <div class="text-xs md:text-sm text-slate-500 truncate">${member.funcao}</div>
+                                        <a href="https://wa.me/55${member.telefone.replace(/\D/g,'')}" target="_blank" 
+                                           class="inline-block text-xs text-emerald-600 hover:text-emerald-700 font-medium mt-1 transition-colors">
+                                            <i class="fa-brands fa-whatsapp mr-1"></i>
+                                            ${member.telefone}
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAdminPanel() {
+            const container = document.getElementById("main-content");
+            const adminCount = usuarios.filter(u => u.isAdmin).length;
+            
+            container.innerHTML = `
+                <div class="max-w-7xl mx-auto">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+                        <div>
+                            <h2 class="text-xl md:text-2xl font-semibold">Painel Administrativo</h2>
+                            <p class="text-sm text-slate-500">${adminCount} administradores ativos</p>
+                        </div>
+                        <div class="flex gap-3 w-full sm:w-auto">
+                            <button onclick="openAdminUsersModal()" 
+                                    class="flex items-center gap-2 bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-2xl font-medium btn-touch transition-colors w-full sm:w-auto justify-center">
+                                <i class="fa-solid fa-users-gear"></i>
+                                Gerenciar Admins
+                            </button>
+                            <button onclick="addNewCulto()" 
+                                    class="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-2xl font-medium btn-touch transition-colors w-full sm:w-auto justify-center">
+                                <i class="fa-solid fa-plus"></i>
+                                Novo Culto
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+                        <div onclick="navigateTo('all-scales')" 
+                             class="bg-white p-6 md:p-8 rounded-3xl border-2 border-orange-100 hover:border-orange-300 cursor-pointer transition-all card-hover">
+                            <i class="fa-solid fa-list text-3xl text-orange-500 mb-3 block"></i>
+                            <h3 class="font-semibold text-lg">Gerenciar Escalas</h3>
+                            <p class="text-sm text-slate-500 mt-1">Crie e edite escalas</p>
+                        </div>
+                        
+                        <div onclick="navigateTo('team')" 
+                             class="bg-white p-6 md:p-8 rounded-3xl border-2 border-blue-100 hover:border-blue-300 cursor-pointer transition-all card-hover">
+                            <i class="fa-solid fa-users text-3xl text-blue-500 mb-3 block"></i>
+                            <h3 class="font-semibold text-lg">Equipe</h3>
+                            <p class="text-sm text-slate-500 mt-1">Visualize os membros</p>
+                        </div>
+                        
+                        <div onclick="openAdminUsersModal()" 
+                             class="bg-white p-6 md:p-8 rounded-3xl border-2 border-purple-100 hover:border-purple-300 cursor-pointer transition-all card-hover">
+                            <i class="fa-solid fa-users-gear text-3xl text-purple-500 mb-3 block"></i>
+                            <h3 class="font-semibold text-lg">Administradores</h3>
+                            <p class="text-sm text-slate-500 mt-1">Gerencie quem é admin</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8 bg-amber-50 border border-amber-200 rounded-3xl p-4 md:p-6">
+                        <div class="flex items-start gap-3">
+                            <i class="fa-solid fa-lightbulb text-amber-500 text-xl mt-0.5"></i>
+                            <div>
+                                <h4 class="font-semibold text-amber-800">Dica Rápida</h4>
+                                <p class="text-sm text-amber-700">Após publicar uma escala, clique em "Notificar" para enviar alertas aos membros.</p>
+                                <p class="text-sm text-amber-700 mt-1">Você pode tornar outros usuários administradores no botão "Gerenciar Admins".</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ============================================
+        // FUNÇÕES AUXILIARES
+        // ============================================
+        function getMemberName(id) {
+            if (!id) return null;
+            const member = membros.find(m => m.id === id);
+            return member ? member.nome : null;
+        }
+
+        function getMemberById(id) {
+            return membros.find(m => m.id === id);
+        }
+
+        function addNewCulto() {
+            const newCulto = {
+                id: Date.now(),
+                data: new Date().toISOString().split('T')[0],
+                horario: "09:00",
+                tipo: "Novo Culto - " + new Date().toLocaleDateString('pt-BR'),
+                status: "rascunho",
+                escalas: {
+                    "Coordenação de Mídia": null,
+                    "Som Principal": null,
+                    "Projeção": null,
+                    "Livestream": null,
+                    "Fotografia": null,
+                    "Iluminação": null
+                }
+            };
+            cultos.unshift(newCulto);
+            saveData();
+            showToast("➕ Novo culto adicionado!", "fa-plus");
+            navigateTo("all-scales");
+        }
+
+        function toggleCultoStatus(id) {
+            const culto = cultos.find(c => c.id === id);
+            if (!culto) return;
+            
+            culto.status = culto.status === 'publicada' ? 'rascunho' : 'publicada';
+            saveData();
+            
+            if (culto.status === 'publicada') {
+                showToast('📨 Escala publicada! Notificações enviadas.', 'fa-bell');
+                sendScaleNotifications(id);
+            } else {
+                showToast('📄 Escala movida para rascunho.', 'fa-file');
+            }
+            
+            navigateTo("all-scales");
+        }
+
+        function editCulto(id) {
+            showToast('🛠️ Função de edição em desenvolvimento.', 'fa-edit');
+        }
+
+        // ============================================
+        // UI HELPERS
+        // ============================================
+        function showToast(message, icon = "fa-check-circle") {
+            const toast = document.getElementById("toast");
+            const toastIcon = document.getElementById("toast-icon");
+            const toastMessage = document.getElementById("toast-message");
+            
+            toastIcon.className = `fa-solid ${icon} ${icon === 'fa-check-circle' ? 'text-emerald-400' : 'text-orange-400'} text-xl flex-shrink-0`;
+            toastMessage.textContent = message;
+            
+            toast.classList.remove("hidden", "toast-hide");
+            toast.className = "fixed bottom-6 left-4 right-4 sm:left-auto sm:right-6 sm:max-w-md bg-slate-800 text-white px-6 py-4 rounded-2xl flex items-center gap-3 shadow-2xl z-50 toast-show";
+            
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => {
+                toast.className = toast.className.replace('toast-show', 'toast-hide');
+                setTimeout(() => toast.classList.add("hidden"), 300);
+            }, 3000);
+        }
+
+        function toggleSidebar() {
+            state.sidebarOpen = !state.sidebarOpen;
+            document.getElementById("sidebar").classList.toggle("open", state.sidebarOpen);
+            document.getElementById("sidebar-overlay").classList.toggle("active", state.sidebarOpen);
+            document.body.style.overflow = state.sidebarOpen ? 'hidden' : '';
+        }
+
+        function closeSidebar() {
+            if (window.innerWidth < 1024) {
+                state.sidebarOpen = false;
+                document.getElementById("sidebar").classList.remove("open");
+                document.getElementById("sidebar-overlay").classList.remove("active");
+                document.body.style.overflow = '';
+            }
+        }
+
+        function toggleMobileSearch() {
+            state.mobileSearchOpen = !state.mobileSearchOpen;
+            const search = document.getElementById("mobile-search");
+            search.classList.toggle("hidden", !state.mobileSearchOpen);
+            if (state.mobileSearchOpen) {
+                setTimeout(() => document.getElementById("search-input-mobile")?.focus(), 100);
+            }
+        }
+
+        function handleSearch() {
+            const term = document.getElementById("search-input").value.trim() || 
+                        document.getElementById("search-input-mobile")?.value?.trim() || '';
+            if (term === "") {
+                showToast("Digite um termo para buscar", "fa-info-circle");
+                return;
+            }
+            
+            const results = {
+                cultos: cultos.filter(c => 
+                    c.tipo.toLowerCase().includes(term.toLowerCase()) ||
+                    Object.keys(c.escalas).some(pos => pos.toLowerCase().includes(term.toLowerCase()))
+                ),
+                membros: membros.filter(m => 
+                    m.nome.toLowerCase().includes(term.toLowerCase()) ||
+                    m.funcao.toLowerCase().includes(term.toLowerCase())
+                )
+            };
+            
+            const total = results.cultos.length + results.membros.length;
+            if (total === 0) {
+                showToast(`🔍 Nenhum resultado para "${term}"`, "fa-search");
+            } else {
+                showToast(`🔍 ${total} resultado(s) para "${term}"`, "fa-search");
+                navigateTo("all-scales");
+            }
+            
+            if (state.mobileSearchOpen) toggleMobileSearch();
+        }
+
+        // ============================================
+        // INICIALIZAÇÃO
+        // ============================================
+        function initializeApp() {
+            if (!loadData()) {
+                initDefaultData();
+            }
+            
+            updateNotificationBadge();
+            renderSidebar();
+            navigateTo("dashboard");
+            
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeNotifications();
+                    closeAdminUsersModal();
+                    closeSidebar();
+                }
+            });
+            
+            console.log(`%c✅ ${CONFIG.APP_NAME} v${CONFIG.VERSION} carregado!`, "color: #FF6B00; font-weight: bold; font-size: 16px;");
+            console.log(`%c👑 Admin Master: ${CONFIG.MASTER_ADMIN_EMAIL}`, "color: #8b5cf6; font-weight: bold;");
+        }
+
+        // Inicia
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!loadData()) {
+                initDefaultData();
+            }
+        });
+    </script>
+</body>
+</html>
